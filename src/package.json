@@ -1,0 +1,5 @@
+{
+    "main": "main.js",
+    "version": "1",
+    "name": "electron-typescript-boilerplate"
+}

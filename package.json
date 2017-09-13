@@ -1,0 +1,28 @@
+{
+  "name": "electron-typescript-boilerplate",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "gulp build",
+    "start": "gulp serve",
+    "watch_old": "tsc --watch --outDir dist/",
+    "watch": "gulp serve"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^1.7.5"
+  },
+  "devDependencies": {
+    "electron-connect": "^0.6.2",
+    "electron-packager": "^8.7.2",
+    "gulp": "^3.9.1",
+    "gulp-atom-electron": "^1.14.0",
+    "gulp-symdest": "^1.1.0",
+    "gulp-typescript": "^3.2.1",
+    "run-sequence": "^2.1.0",
+    "rimraf": "^2.6.1",
+    "typescript": "^2.4.2"
+  }
+}
