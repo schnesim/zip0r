@@ -3,13 +3,14 @@ const ts = require('gulp-typescript');
 const runSequnce = require('run-sequence');
 const atomElectron = require('gulp-atom-electron');
 const symdest = require('gulp-symdest');
+const concat = require('gulp-concat');
 const electronConnect = require('electron-connect').server.create({ stopOnClose: true });
 const rimraf = require('rimraf');
 const electron = require('gulp-atom-electron');
 
 const tsProject = ts.createProject('tsconfig.json');
 
-gulp.task('build', ['clean', 'copy', 'transpile']);
+gulp.task('build', ['clean', 'copy', 'css', 'transpile']);
 
 gulp.task('clean', () => {
   rimraf.sync('./dist');
@@ -34,9 +35,13 @@ gulp.task('watch', () => {
   });
 })
 
+gulp.task('css', () => {
+  gulp.src('./src/**/*.css').pipe(concat('style.css')).pipe(gulp.dest('dist'));
+})
+
 // Copies everything "static" to the destination folder
 gulp.task('copy', () => {
-  gulp.src(['./src/**/*', '!./src/**/*.ts']).pipe(gulp.dest('dist'));
+  gulp.src(['./src/**/*', '!./src/**/*.ts', '!./src/**/*.css']).pipe(gulp.dest('dist'));
 })
 
 // Starts electron, callback is needed so we can shutdown gulp when we're done
