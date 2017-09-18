@@ -19,10 +19,11 @@
     "electron-packager": "^8.7.2",
     "gulp": "^3.9.1",
     "gulp-atom-electron": "^1.14.0",
+    "gulp-concat": "^2.6.1",
     "gulp-symdest": "^1.1.0",
     "gulp-typescript": "^3.2.1",
-    "run-sequence": "^2.1.0",
     "rimraf": "^2.6.1",
+    "run-sequence": "^2.1.0",
     "typescript": "^2.4.2"
   }
 }
