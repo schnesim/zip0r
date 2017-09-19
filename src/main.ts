@@ -1,5 +1,8 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, dialog, Menu } from 'electron';
 import * as path from 'path';
+import * as fs from 'fs';
+// const ipc = require('ipc');
+// import * as ipc from 'ipc';
 const client = process.env.NODE_ENV === 'development' ? require('electron-connect').client : void 0;
 
 app.on('ready', function () {
@@ -9,11 +12,131 @@ app.on('ready', function () {
     },
     title: 'electron-typescript-boilerplate'
   });
+  console.log(process.argv)  ;
+  mainWindow.webContents.on('did-finish-load', () => {
+    mainWindow.webContents.send('archive-path', 'some path')
+  });
   mainWindow.loadURL('file://' + __dirname + '/index.html');
   if (client !== void 0) {
     client.create(mainWindow);
   }
 });
+
+const template: Array<object> = [
+  {
+    label: 'File',
+    submenu: [
+      {
+        label: 'Open',
+        click() {
+          require('electron').dialog.showOpenDialog({
+            title: 'Open archive',
+            defaultPath: '.',
+            filters: [
+              {name: 'All Files', extensions: ['*']}
+            ],
+            properties: ['openFile']
+          })
+        }
+      },
+      { role: 'quit' }
+    ]
+
+  },
+  {
+    label: 'Edit',
+    submenu: [
+      { role: 'undo' },
+      { role: 'redo' },
+      { type: 'separator' },
+      { role: 'cut' },
+      { role: 'copy' },
+      { role: 'paste' },
+      { role: 'pasteandmatchstyle' },
+      { role: 'delete' },
+      { role: 'selectall' }
+    ]
+  },
+  {
+    label: 'View',
+    submenu: [
+      { role: 'reload' },
+      { role: 'forcereload' },
+      { role: 'toggledevtools' },
+      { type: 'separator' },
+      { role: 'resetzoom' },
+      { role: 'zoomin' },
+      { role: 'zoomout' },
+      { type: 'separator' },
+      { role: 'togglefullscreen' }
+    ]
+  },
+  {
+    role: 'window',
+    submenu: [
+      { role: 'minimize' },
+      { role: 'close' }
+    ]
+  },
+  {
+    role: 'help',
+    submenu: [
+      {
+        label: 'Learn More',
+        click() { require('electron').shell.openExternal('https://electron.atom.io') }
+      }
+    ]
+  }
+]
+
+if (process.platform === 'darwin') {
+  template.unshift({
+    label: app.getName(),
+    submenu: [
+      { role: 'about' },
+      { type: 'separator' },
+      { role: 'services', submenu: [] },
+      { type: 'separator' },
+      { role: 'hide' },
+      { role: 'hideothers' },
+      { role: 'unhide' },
+      { type: 'separator' },
+      { role: 'quit' }
+    ]
+  })
+
+  // Edit menu
+  template[1]['submenu'].push(
+    { type: 'separator' },
+    {
+      label: 'Speech',
+      submenu: [
+        { role: 'startspeaking' },
+        { role: 'stopspeaking' }
+      ]
+    }
+  )
+
+  // Window menu
+  template[3]['submenu'] = [
+    { role: 'close' },
+    { role: 'minimize' },
+    { role: 'zoom' },
+    { type: 'separator' },
+    { role: 'front' }
+  ]
+}
+
+const menu = Menu.buildFromTemplate(template)
+Menu.setApplicationMenu(menu)
+
+// ipcMain.on('get-file-data', () => {
+//   var data = void 0;
+//   if (process.platform == 'win32' && process.argv.length >= 2) {
+//     var openFilePath = process.argv[1];
+//     data = fs.readFileSync(openFilePath, 'utf-8');
+//   }
+// });
 
 app.on('window-all-closed', function () {
   app.quit();

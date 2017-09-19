@@ -7,16 +7,12 @@ import { ZipController } from './7z/zipController';
 const { remote } = require('electron')
 const { Menu, MenuItem } = remote
 
-// let uiController = void 0;
-// let container = void 0;
-
 document.addEventListener('DOMContentLoaded', function () {
   let uiController = new UiController();
-  let container = new Container();
-  document.getElementsByTagName('body')[0].appendChild(container.getDomNode());
+  
 
   const z = new ZipController();
-  z.listArchiveContent('');
+  z.listArchiveContent('zip0r.7z');
 
   const menu = new Menu()
   menu.append(new MenuItem({ label: 'MenuItem1', click() { console.log('item 1 clicked') } }))

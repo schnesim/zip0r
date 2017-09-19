@@ -5,7 +5,7 @@
   "main": "dist/main.js",
   "scripts": {
     "build": "gulp build",
-    "start": "gulp serve",
+    "start": "electron .",
     "watch_old": "tsc --watch --outDir dist/",
     "watch": "gulp serve"
   },
