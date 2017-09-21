@@ -22,8 +22,8 @@ gulp.task('serve', () => {
 });
 
 gulp.task('watch', () => {
-  gulp.watch(['./src/*.html', './src/*.css'], () => {
-    runSequnce('copy', 'electron-reload');
+  gulp.watch(['./src/**/*.html', './src/**/*.css'], () => {
+    runSequnce('copy', 'css', 'electron-reload');
   });
   // Changes to the file creating the electron window require a full restart
   gulp.watch(['src/main.ts'], () => {

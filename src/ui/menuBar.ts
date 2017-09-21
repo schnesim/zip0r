@@ -14,7 +14,12 @@ export class MenuBar {
     }
 
     private createButtons() {
-        this._buttons.push(new MenuButton('Extract'));
+        let menuButton = new MenuButton();
+        menuButton.getDomNode().classList.add('menu-button-add')
+        this._buttons.push(menuButton);
+        menuButton = new MenuButton();
+        menuButton.getDomNode().classList.add('menu-button-extract')
+        this._buttons.push(menuButton);
     }
 
     public getDomNode(): HTMLElement {
@@ -22,20 +27,33 @@ export class MenuBar {
     }
 }
 
-export class MenuButton extends ViewElement {;
-    /**
-     * Fräge: Wie komme ich von einem Click event auf einen MenuButton zu einer Methode im UiController?
-     * Problemstellung: Eine Komponente möchte eine Aktion irgendwo anders auslösen. D.h. die Komponente
-     * muss in der Lage sein, Events zu erzeugen, mit Informationen anzureichern, zu verschicken und die
-     * Komponenten auf der anderen Seite, die ihrerseits die Aktion auszuführen haben, hören auf derartige
-     * Events. notify()
-     */
-    
-    constructor(name) {
+export class MenuButton extends ViewElement {
+    ;
+    constructor() {
         super();
         this.setDomNode(document.createElement('button'));
         this.getDomNode().classList.add('menu-button');
-        (this.getDomNode() as HTMLButtonElement).innerText = name;
+        this.getDomNode().addEventListener('mouseenter', this.mouseover.bind(this));
+        this.getDomNode().addEventListener('mouseleave', this.mouseleave.bind(this));
+        this.getDomNode().addEventListener('mousedown', this.mousedown.bind(this));
+        this.getDomNode().addEventListener('mouseup', this.mouseup.bind(this));
     }
-    
+
+    private mouseover() {
+        this.getDomNode().style.backgroundColor = 'rgb(213,202,0)';
+    }
+
+    private mouseleave() {
+        this.getDomNode().style.backgroundColor = 'lightyellow';
+    }
+
+    private mousedown(e: MouseEvent) {
+        if (e.button === 0) {
+            this.getDomNode().style.backgroundColor = 'rgb(98,92,0)';
+        }
+    }
+
+    private mouseup() {
+        this.getDomNode().style.backgroundColor = 'rgb(213,202,0)';
+    }
 }

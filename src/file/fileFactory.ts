@@ -4,7 +4,7 @@ export class FileFactory {
 
     public createFile(line): FileModel {
         const lineElements = this.parseLine(line);
-        const result = new FileModel(lineElements[0], lineElements[1], lineElements[2], lineElements[3], lineElements[4]);
+        const result = new FileModel(lineElements[0], lineElements[1], parseInt(lineElements[2]), parseInt(lineElements[3]), lineElements[4]);
         return result;
     }
 

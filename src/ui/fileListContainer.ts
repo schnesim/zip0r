@@ -19,7 +19,8 @@ export class FileListContainer extends ViewElement {
 export class FileElement extends ViewElement {
   private _fileModel: FileModel;
   private _icon: HTMLImageElement;
-  private _text: HTMLDivElement;
+  private _iconDiv: HTMLDivElement;
+  private _title: HTMLDivElement;
   constructor(fileModel: FileModel) {
     super();
     this.setDomNode(document.createElement('div'));
@@ -29,9 +30,17 @@ export class FileElement extends ViewElement {
     } else {
       this._icon.src = './img/folder.svg';
     }
+    this._icon.classList.add('file-icon')
+    this._iconDiv = document.createElement('div');
+    this._iconDiv.appendChild(this._icon);
+    this._iconDiv.classList.add('file-icon-div');
+    this._title = document.createElement('div');
+    this._title.classList.add('file-text');
+    this._title.innerText = fileModel.name;
 
     this.getDomNode().classList.add('file-element');
-    this.getDomNode().appendChild(this._icon);
+    this.getDomNode().appendChild(this._iconDiv);
+    this.getDomNode().appendChild(this._title);
     //this._icon = document.createElement('img');
     this._fileModel = fileModel;
   }

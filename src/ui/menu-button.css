@@ -3,4 +3,16 @@
     height: 3em;
     border: solid 1px green;
     float: left;
+    background-size: 32px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: lightyellow;
+}
+
+.menu-button.menu-button-add {
+    background-image: url("./img/add.svg");
+}
+
+.menu-button.menu-button-extract {
+    background-image: url("./img/minus.svg");
 }
