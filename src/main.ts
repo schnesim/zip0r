@@ -4,9 +4,10 @@ import * as fs from 'fs';
 // const ipc = require('ipc');
 // import * as ipc from 'ipc';
 const client = process.env.NODE_ENV === 'development' ? require('electron-connect').client : void 0;
+let mainWindow = void 0;
 
 app.on('ready', function () {
-  var mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 800, height: 600, minWidth: 800, webPreferences: {
       experimentalFeatures: true,
     },
@@ -29,7 +30,7 @@ const template: Array<object> = [
       {
         label: 'Open',
         click() {
-          require('electron').dialog.showOpenDialog({
+          require('electron').dialog.showOpenDialog(mainWindow, {
             title: 'Open archive',
             defaultPath: '.',
             filters: [
@@ -84,6 +85,13 @@ const template: Array<object> = [
       {
         label: 'Learn More',
         click() { require('electron').shell.openExternal('https://electron.atom.io') }
+      },
+      {
+        label: 'About',
+        click() {dialog.showMessageBox(mainWindow, {
+          title: 'About',
+          message: 'Icons courtesy of:\r- www.iconfinder.com\r- icons8.com'
+        })}
       }
     ]
   }

@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 
 import { FileFactory } from '../file/fileFactory'
+import { FileModel } from '../file/fileModel'
 
 export class ZipController {
 
@@ -12,20 +13,16 @@ export class ZipController {
         this._fileFactory = new FileFactory();
     }
 
-    public listArchiveContent(path) {
+    public listArchiveContent(path: string): Array<FileModel> {
         const process = child_process.spawnSync('lib/win32/7za/7za.exe',
             ['l', 'zip0r.7z'], { encoding: 'utf8' });
         const flatFile = process.stdout;
         const files = this.parseFlatFile(flatFile);
         console.log(files);
+        return files;
     }
 
-    /**
-     * 
-     * @param {string} flatFile 
-     * @returns {Array<FileModel>}
-     */
-    private parseFlatFile(flatFile) {
+    private parseFlatFile(flatFile: string): Array<FileModel> {
         let s = '';
         s = flatFile;
         const lines = s.split(os.EOL);

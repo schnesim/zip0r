@@ -14,4 +14,24 @@ export class FileModel {
     this._name = name;
   }
 
+  get timestamp(): string {
+    return this._timestamp;
+  }
+
+  get attribute(): string {
+    return this._attribute;
+  }
+
+  get size(): number {
+    return this._size;
+  }
+
+  get compressedSize(): number {
+    return this._compressedSize;
+  }
+
+  get name(): string {
+    return this.name;
+  }
+
 }
