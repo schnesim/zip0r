@@ -1,5 +1,5 @@
 .menu-button {
-    width: 3em;
+    width: 6em;
     height: 3em;
     border: solid 1px green;
     float: left;
@@ -9,10 +9,10 @@
     background-color: lightyellow;
 }
 
-.menu-button.menu-button-add {
+/* .menu-button.menu-button-add {
     background-image: url("./img/add.svg");
-}
+} */
 
-.menu-button.menu-button-extract {
+/* .menu-button.menu-button-extract {
     background-image: url("./img/minus.svg");
-}
+} */

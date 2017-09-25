@@ -1,11 +1,12 @@
 import { MenuBar } from './menuBar';
 import { FileListContainer } from './fileListContainer';
 import { FileModel } from '../file/fileModel';
+import { Grid } from './grid';
 import { ZipController } from '../7z/zipController'
 import { ipcRenderer } from 'electron';
 
 export class Container {
-  
+
   private _domNode: HTMLElement;
   private _menuBar: MenuBar;
   private _fileListContainer: FileListContainer;
@@ -19,11 +20,13 @@ export class Container {
     this._zipController = new ZipController();
     ipcRenderer.on('archive-path', this.listArchiveContent.bind(this));
   }
-  
+
   private listArchiveContent(event, data) {
     const archiveContent = this._zipController.listArchiveContent(data);
     this._fileListContainer = new FileListContainer(archiveContent);
     this._domNode.appendChild(this._fileListContainer.getDomNode());
+    const g = new Grid(null);
+    this._domNode.appendChild(g.getDomNode());
   }
 
   public getDomNode(): HTMLElement {

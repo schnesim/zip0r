@@ -16,9 +16,11 @@ export class MenuBar {
     private createButtons() {
         let menuButton = new MenuButton();
         menuButton.getDomNode().classList.add('menu-button-add')
+        menuButton.getDomNode().textContent = 'Add';
         this._buttons.push(menuButton);
         menuButton = new MenuButton();
         menuButton.getDomNode().classList.add('menu-button-extract')
+        menuButton.getDomNode().textContent = 'Extract';
         this._buttons.push(menuButton);
     }
 
