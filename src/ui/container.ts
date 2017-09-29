@@ -1,7 +1,7 @@
 import { MenuBar } from './menuBar';
 import { FileListContainer } from './fileListContainer';
 import { FileModel } from '../file/fileModel';
-import { Grid } from './grid';
+import { Grid, GridConfig, GridColumn } from './grid';
 import { ZipController } from '../7z/zipController'
 import { ipcRenderer } from 'electron';
 
@@ -11,6 +11,8 @@ export class Container {
   private _menuBar: MenuBar;
   private _fileListContainer: FileListContainer;
   private _zipController: ZipController;
+  private _grid: Grid;
+  private _gridConfig: GridConfig;
 
   constructor() {
     this._domNode = document.createElement('div');
@@ -25,8 +27,15 @@ export class Container {
     const archiveContent = this._zipController.listArchiveContent(data);
     this._fileListContainer = new FileListContainer(archiveContent);
     this._domNode.appendChild(this._fileListContainer.getDomNode());
-    const g = new Grid(null);
-    this._domNode.appendChild(g.getDomNode());
+    
+    this._gridConfig = new GridConfig();
+    this._gridConfig.addColumn(new GridColumn('Name', 20));
+    this._gridConfig.addColumn(new GridColumn('Size', 20));
+    this._gridConfig.addColumn(new GridColumn('Compressed Size', 20));
+    this._grid = new Grid(this._gridConfig);
+    this._domNode.appendChild(this._grid.getDomNode());
+
+    this._grid.getDomNode().appendChild(this._grid.addRow(['one', 'two']));
   }
 
   public getDomNode(): HTMLElement {
