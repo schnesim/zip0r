@@ -14,12 +14,27 @@ export class ZipController {
     }
 
     public listArchiveContent(path: string): Array<FileModel> {
-        const process = child_process.spawnSync('lib/win32/7za/7za.exe',
-            ['l', 'zip0r.7z'], { encoding: 'utf8' });
+        const process = child_process.spawnSync('lib/darwin/7z/7za',
+            ['l', '/Volumes/RamDisk/Cache.zip'], { encoding: 'utf8' });
+        // const process = child_process.spawnSync('lib/win32/7za/7za.exe',
+        //     ['l', 'zip0r.7z'], { encoding: 'utf8' });
         const flatFile = process.stdout;
         const files = this.parseFlatFile(flatFile);
         console.log(files);
         return files;
+    }
+
+    public createZipFile(folder: string) {
+        const process = child_process.spawn('lib/darwin/7z/7za',
+            ['a', '/Volumes/RamDisk/test', '/Volumes/RamDisk/Cache']);
+        process.stdout.setEncoding('utf8');
+        process.stderr.setEncoding('utf8');
+        process.stdout.on('data', (data) => {
+            console.log('data: ' + data);
+        });
+        process.stderr.on('data', (data) => {
+            console.log('error: ' + data)
+        })
     }
 
     private parseFlatFile(flatFile: string): Array<FileModel> {

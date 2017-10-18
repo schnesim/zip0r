@@ -7,11 +7,12 @@ import { Container } from './ui/container';
 
 const { remote } = require('electron')
 const { Menu, MenuItem } = remote
+let container;
 
 document.addEventListener('DOMContentLoaded', function () {
-  const container = new Container();
-  document.getElementsByTagName('body')[0].appendChild(container.getDomNode());  
-  
+  container = new Container();
+  document.getElementsByTagName('body')[0].appendChild(container.getDomNode());
+
 
   // const z = new ZipController();
   // z.listArchiveContent('zip0r.7z');

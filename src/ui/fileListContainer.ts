@@ -2,7 +2,9 @@ import { ViewElement } from './viewElement';
 import { FileModel } from '../file/fileModel';
 
 export class FileListContainer extends ViewElement {
+
   private _fileElements: Array<FileElement>;
+  
   constructor(files: Array<FileModel>) {
     super();
     this._fileElements = [];

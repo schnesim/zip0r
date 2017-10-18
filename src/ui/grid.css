@@ -1,0 +1,12 @@
+.table {
+  border-collapse: collapse;
+}
+
+.row:hover {
+  background-color: lightblue;
+}
+
+.data {
+  border: solid 1px lightgray;
+  padding: 5px;
+}

@@ -1,4 +1,5 @@
 import { ViewElement } from './viewElement';
+import { ZipController } from '../7z/zipController'
 
 export class MenuBar {
     private _domNode: HTMLDivElement;
@@ -18,6 +19,10 @@ export class MenuBar {
         menuButton.getDomNode().classList.add('menu-button-add')
         menuButton.getDomNode().textContent = 'Add';
         this._buttons.push(menuButton);
+        menuButton.getDomNode().addEventListener('click', () => {
+            let z = new ZipController();
+            z.createZipFile('');
+        })
         menuButton = new MenuButton();
         menuButton.getDomNode().classList.add('menu-button-extract')
         menuButton.getDomNode().textContent = 'Extract';
@@ -33,7 +38,7 @@ export class MenuButton extends ViewElement {
     ;
     constructor() {
         super();
-        this.setDomNode(document.createElement('button'));
+        this.setDomNode(document.createElement('div'));
         this.getDomNode().classList.add('menu-button');
         this.getDomNode().addEventListener('mouseenter', this.mouseover.bind(this));
         this.getDomNode().addEventListener('mouseleave', this.mouseleave.bind(this));

@@ -25,17 +25,19 @@ export class Container {
 
   private listArchiveContent(event, data) {
     const archiveContent = this._zipController.listArchiveContent(data);
-    this._fileListContainer = new FileListContainer(archiveContent);
-    this._domNode.appendChild(this._fileListContainer.getDomNode());
+    // this._fileListContainer = new FileListContainer(archiveContent);
+    // this._domNode.appendChild(this._fileListContainer.getDomNode());
     
     this._gridConfig = new GridConfig();
     this._gridConfig.addColumn(new GridColumn('Name', 20));
     this._gridConfig.addColumn(new GridColumn('Size', 20));
-    this._gridConfig.addColumn(new GridColumn('Compressed Size', 20));
+    this._gridConfig.addColumn(new GridColumn('Compressed Size', 120));
     this._grid = new Grid(this._gridConfig);
+    for (let content of archiveContent) {
+      this._grid.addRow([content.name, content.size, content.compressedSize]);
+    }
     this._domNode.appendChild(this._grid.getDomNode());
-
-    this._grid.getDomNode().appendChild(this._grid.addRow(['one', 'two']));
+    this._grid.addRow(['one', 'two']);
   }
 
   public getDomNode(): HTMLElement {

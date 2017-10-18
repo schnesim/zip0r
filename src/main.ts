@@ -13,6 +13,7 @@ app.on('ready', function () {
     },
     title: 'electron-typescript-boilerplate'
   });
+  mainWindow.toggleDevTools();
   console.log(process.argv)  ;
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.webContents.send('archive-path', 'some path')
@@ -136,15 +137,7 @@ if (process.platform === 'darwin') {
 }
 
 const menu = Menu.buildFromTemplate(template)
-Menu.setApplicationMenu(menu)
-
-// ipcMain.on('get-file-data', () => {
-//   var data = void 0;
-//   if (process.platform == 'win32' && process.argv.length >= 2) {
-//     var openFilePath = process.argv[1];
-//     data = fs.readFileSync(openFilePath, 'utf-8');
-//   }
-// });
+// Menu.setApplicationMenu(menu)
 
 app.on('window-all-closed', function () {
   app.quit();
