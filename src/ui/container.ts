@@ -1,7 +1,7 @@
 import { MenuBar } from './menuBar';
 import { FileListContainer } from './fileListContainer';
 import { FileModel } from '../file/fileModel';
-import { Grid, GridConfig, GridColumn } from './grid';
+import { Grid, GridConfig, GridColumn } from './grid/grid';
 import { ZipController } from '../7z/zipController'
 import { ipcRenderer } from 'electron';
 
@@ -37,7 +37,7 @@ export class Container {
       this._grid.addRow([content.name, content.size, content.compressedSize]);
     }
     this._domNode.appendChild(this._grid.getDomNode());
-    this._grid.addRow(['one', 'two']);
+    this._grid.addRow(['name', 'size', 'compressedSize']);
   }
 
   public getDomNode(): HTMLElement {

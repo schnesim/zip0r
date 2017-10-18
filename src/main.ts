@@ -14,7 +14,7 @@ app.on('ready', function () {
     title: 'electron-typescript-boilerplate'
   });
   mainWindow.toggleDevTools();
-  console.log(process.argv)  ;
+  console.log(process.argv);
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.webContents.send('archive-path', 'some path')
   });
@@ -22,7 +22,13 @@ app.on('ready', function () {
   if (client !== void 0) {
     client.create(mainWindow);
   }
+  const menu = Menu.buildFromTemplate(template)
+  Menu.setApplicationMenu(menu)
 });
+
+const openFileCallback = (files) => {
+  mainWindow.webContents.send('archive-path', files);
+}
 
 const template: Array<object> = [
   {
@@ -35,15 +41,14 @@ const template: Array<object> = [
             title: 'Open archive',
             defaultPath: '.',
             filters: [
-              {name: 'All Files', extensions: ['*']}
+              { name: 'All Files', extensions: ['*'] }
             ],
             properties: ['openFile']
-          })
+          }, openFileCallback);
         }
       },
       { role: 'quit' }
     ]
-
   },
   {
     label: 'Edit',
@@ -89,16 +94,19 @@ const template: Array<object> = [
       },
       {
         label: 'About',
-        click() {dialog.showMessageBox(mainWindow, {
-          title: 'About',
-          message: 'Icons courtesy of:\r- www.iconfinder.com\r- icons8.com'
-        })}
+        click() {
+          dialog.showMessageBox(mainWindow, {
+            title: 'About',
+            message: 'Icons courtesy of:\r- www.iconfinder.com\r- icons8.com'
+          })
+        }
       }
     ]
   }
 ]
 
 if (process.platform === 'darwin') {
+
   template.unshift({
     label: app.getName(),
     submenu: [
@@ -136,7 +144,7 @@ if (process.platform === 'darwin') {
   ]
 }
 
-const menu = Menu.buildFromTemplate(template)
+// const menu = Menu.buildFromTemplate(template)
 // Menu.setApplicationMenu(menu)
 
 app.on('window-all-closed', function () {

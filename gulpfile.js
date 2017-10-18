@@ -48,12 +48,19 @@ gulp.task('copy', () => {
 gulp.task('electron-start', () => {
   electronConnect.start(callback);
 });
-gulp.task('electron-reload', electronConnect.reload);
-gulp.task('electron-restart', electronConnect.restart);
+
+const reload = () => {
+  electronConnect.reload();
+}
+gulp.task('electron-reload', reload);
+
+const restart = () => {
+  electronConnect.restart();
+}
+gulp.task('electron-restart', restart);
 
 gulp.task('transpile', () => {
-  var tsResult = gulp.src('src/**/*.ts')
-    .pipe(tsProject());
+  var tsResult = gulp.src('src/**/*.ts').pipe(tsProject());
   return tsResult.js.pipe(gulp.dest('dist'));
 })
 

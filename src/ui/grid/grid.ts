@@ -1,4 +1,4 @@
-import { ViewElement } from './viewElement'
+import { ViewElement } from '../viewElement'
 
 export class Grid {
 
@@ -6,7 +6,8 @@ export class Grid {
   private _tableHead: HTMLTableSectionElement;
   private _tableHeaderRow: HTMLTableRowElement;
   // private _tableHeaderCells: Array<HTMLTableHeaderCellElement>;
-  private _data: Array<HTMLTableRowElement>;
+  // private _data: Array<HTMLTableRowElement>;
+  private _gridRows: Array<GridRow>;
   private _gridConfig: GridConfig;
   private _columnCount: number;
   private _rowCount: number;
@@ -15,6 +16,7 @@ export class Grid {
     this._gridConfig = gridConfig;
     this._columnCount = 0;
     this._rowCount = 0;
+    this._gridRows = [];
     this._domNode = document.createElement('table');
     this._domNode.classList.add('table');
     this._tableHead = document.createElement('thead');
@@ -49,16 +51,8 @@ export class Grid {
 
   public addRow(rowData: Array<any>) {
     const gridRow = new GridRow(rowData, this._gridConfig, this._rowCount);
-    for (var index = 0; index < rowData.length; index++) {
-      const td = document.createElement('td');
-      td.style.width = this._gridConfig.getColumns()[index].getWidth() + 'px';
-      td.classList.add('data');
-      td.innerText = rowData[index];
-      row.appendChild(td);
-    }
-    this._domNode.appendChild(row);
-
     this._domNode.appendChild(gridRow.getDomNode());
+    this._gridRows.push(gridRow);
     this._rowCount++;
   }
 
@@ -95,7 +89,7 @@ export class GridRow extends ViewElement {
     this._gridConfig = config;
     const row = document.createElement('tr');
     row.classList.add('row');
-    row.addEventListener('click', this.tableRowClick.bind(this));
+    //row.addEventListener('click', this.tableRowClick.bind(this));
     row.setAttribute('rowNumber', String(rowCount));
     this.setDomNode(document.createElement('tr'));
     for (var index = 0; index < data.length; index++) {
