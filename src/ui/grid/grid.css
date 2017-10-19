@@ -2,11 +2,35 @@
   border-collapse: collapse;
 }
 
+.row {
+  background-color: yellow;
+}
+
 .row:hover {
   background-color: lightblue;
 }
 
+.header {
+  border: solid 1px black;
+  background-color: lightgray
+}
+
+.header-cell:hover {
+  background-color: #555555;
+  padding: 2px;
+  color: white;
+}
+
 .data {
-  border: solid 1px lightgray;
+  border: solid 1px black;
   padding: 5px;
 }
+
+.sort-icon {
+  width: 16px;
+  height: 16px;
+  position: relative;
+  top: 3px;
+  margin-left: 2px;
+}
+

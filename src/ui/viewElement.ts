@@ -2,11 +2,11 @@ export abstract class ViewElement {
 
     private _domNode: HTMLElement;
 
-    public setDomNode(elem: HTMLElement): void {
+    set domNode(elem: HTMLElement) {;
         this._domNode = elem;
     }
 
-    public getDomNode(): HTMLElement {
+    get domNode(): HTMLElement {
         return this._domNode;
     }
 }

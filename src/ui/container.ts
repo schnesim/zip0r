@@ -1,7 +1,7 @@
 import { MenuBar } from './menuBar';
 import { FileListContainer } from './fileListContainer';
 import { FileModel } from '../file/fileModel';
-import { Grid, GridConfig, GridColumn } from './grid/grid';
+import { Grid, GridConfig, GridColumn, GridColumnFactory } from './grid/grid';
 import { ZipController } from '../7z/zipController'
 import { ipcRenderer } from 'electron';
 
@@ -29,15 +29,14 @@ export class Container {
     // this._domNode.appendChild(this._fileListContainer.getDomNode());
     
     this._gridConfig = new GridConfig();
-    this._gridConfig.addColumn(new GridColumn('Name', 20));
-    this._gridConfig.addColumn(new GridColumn('Size', 20));
-    this._gridConfig.addColumn(new GridColumn('Compressed Size', 120));
+    this._gridConfig.addColumn(new GridColumnFactory().setTitle('Name').setWidth(20).setSortable(true).build());
+    this._gridConfig.addColumn(new GridColumnFactory().setTitle('Size').setWidth(20).setSortable(true).build());
+    this._gridConfig.addColumn(new GridColumnFactory().setTitle('Compressed Size').setWidth(200).setSortable(false).build());
     this._grid = new Grid(this._gridConfig);
     for (let content of archiveContent) {
       this._grid.addRow([content.name, content.size, content.compressedSize]);
     }
     this._domNode.appendChild(this._grid.getDomNode());
-    this._grid.addRow(['name', 'size', 'compressedSize']);
   }
 
   public getDomNode(): HTMLElement {

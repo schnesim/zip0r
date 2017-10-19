@@ -10,7 +10,7 @@ export class FileModel {
     this._timestamp = timestamp;
     this._attribute = attribute;
     this._size = size;
-    this._compressedSize = compressedSize;
+    this._compressedSize = isNaN(compressedSize) ? 0 : compressedSize;
     this._name = name;
   }
 

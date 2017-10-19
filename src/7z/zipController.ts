@@ -14,13 +14,18 @@ export class ZipController {
     }
 
     public listArchiveContent(path: string): Array<FileModel> {
-        const process = child_process.spawnSync('lib/darwin/7z/7za',
-            ['l', '/Volumes/RamDisk/Cache.zip'], { encoding: 'utf8' });
-        // const process = child_process.spawnSync('lib/win32/7za/7za.exe',
-        //     ['l', 'zip0r.7z'], { encoding: 'utf8' });
+        let process = void 0;
+        if (os.platform() === 'darwin') {
+            process = child_process.spawnSync('lib/darwin/7z/7za',
+                ['l', path], { encoding: 'utf8' });
+        }
+        if (os.platform() === 'win32') {
+            process = child_process.spawnSync('lib/win32/7za/7za.exe',
+                ['l', path], { encoding: 'utf8' });
+        }
         const flatFile = process.stdout;
+        console.log(flatFile)
         const files = this.parseFlatFile(flatFile);
-        console.log(files);
         return files;
     }
 

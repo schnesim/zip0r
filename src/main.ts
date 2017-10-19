@@ -16,7 +16,7 @@ app.on('ready', function () {
   mainWindow.toggleDevTools();
   console.log(process.argv);
   mainWindow.webContents.on('did-finish-load', () => {
-    mainWindow.webContents.send('archive-path', 'some path')
+    //mainWindow.webContents.send('archive-path', 'some path')
   });
   mainWindow.loadURL('file://' + __dirname + '/index.html');
   if (client !== void 0) {
@@ -45,7 +45,8 @@ const template: Array<object> = [
             ],
             properties: ['openFile']
           }, openFileCallback);
-        }
+        },
+        accelerator: 'CommandOrControl+o'
       },
       { role: 'quit' }
     ]

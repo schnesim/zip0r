@@ -10,22 +10,22 @@ export class MenuBar {
         this._buttons = [];
         this.createButtons();
         this._buttons.forEach(element => {
-            this._domNode.appendChild(element.getDomNode());
+            this._domNode.appendChild(element.domNode);
         });
     }
 
     private createButtons() {
         let menuButton = new MenuButton();
-        menuButton.getDomNode().classList.add('menu-button-add')
-        menuButton.getDomNode().textContent = 'Add';
+        menuButton.domNode.classList.add('menu-button-add')
+        menuButton.domNode.textContent = 'Add';
         this._buttons.push(menuButton);
-        menuButton.getDomNode().addEventListener('click', () => {
+        menuButton.domNode.addEventListener('click', () => {
             let z = new ZipController();
             z.createZipFile('');
         })
         menuButton = new MenuButton();
-        menuButton.getDomNode().classList.add('menu-button-extract')
-        menuButton.getDomNode().textContent = 'Extract';
+        menuButton.domNode.classList.add('menu-button-extract')
+        menuButton.domNode.textContent = 'Extract';
         this._buttons.push(menuButton);
     }
 
@@ -38,29 +38,29 @@ export class MenuButton extends ViewElement {
     ;
     constructor() {
         super();
-        this.setDomNode(document.createElement('div'));
-        this.getDomNode().classList.add('menu-button');
-        this.getDomNode().addEventListener('mouseenter', this.mouseover.bind(this));
-        this.getDomNode().addEventListener('mouseleave', this.mouseleave.bind(this));
-        this.getDomNode().addEventListener('mousedown', this.mousedown.bind(this));
-        this.getDomNode().addEventListener('mouseup', this.mouseup.bind(this));
+        this.domNode = document.createElement('div');
+        this.domNode.classList.add('menu-button');
+        this.domNode.addEventListener('mouseenter', this.mouseover.bind(this));
+        this.domNode.addEventListener('mouseleave', this.mouseleave.bind(this));
+        this.domNode.addEventListener('mousedown', this.mousedown.bind(this));
+        this.domNode.addEventListener('mouseup', this.mouseup.bind(this));
     }
 
     private mouseover() {
-        this.getDomNode().style.backgroundColor = 'rgb(213,202,0)';
+        this.domNode.style.backgroundColor = 'rgb(213,202,0)';
     }
 
     private mouseleave() {
-        this.getDomNode().style.backgroundColor = 'lightyellow';
+        this.domNode.style.backgroundColor = 'lightyellow';
     }
 
     private mousedown(e: MouseEvent) {
         if (e.button === 0) {
-            this.getDomNode().style.backgroundColor = 'rgb(98,92,0)';
+            this.domNode.style.backgroundColor = 'rgb(98,92,0)';
         }
     }
 
     private mouseup() {
-        this.getDomNode().style.backgroundColor = 'rgb(213,202,0)';
+        this.domNode.style.backgroundColor = 'rgb(213,202,0)';
     }
 }
