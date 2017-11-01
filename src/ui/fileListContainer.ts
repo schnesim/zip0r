@@ -8,12 +8,12 @@ export class FileListContainer extends ViewElement {
   constructor(files: Array<FileModel>) {
     super();
     this._fileElements = [];
-    this.setDomNode(document.createElement('div'));
+    this.domNode = document.createElement('div');
     for (let file of files) {
       this._fileElements.push(new FileElement(file));
     }
     for (let file of this._fileElements) {
-      this.getDomNode().appendChild(file.getDomNode());
+      this.domNode.appendChild(file.domNode);
     }
   }
 }
@@ -25,7 +25,7 @@ export class FileElement extends ViewElement {
   private _title: HTMLDivElement;
   constructor(fileModel: FileModel) {
     super();
-    this.setDomNode(document.createElement('div'));
+    this.domNode = document.createElement('div');
     this._icon = document.createElement('img');
     if (fileModel.attribute === FileConstants.ATTRIB_FILE) {
       this._icon.src = './img/file.svg';
@@ -40,9 +40,9 @@ export class FileElement extends ViewElement {
     this._title.classList.add('file-text');
     this._title.innerText = fileModel.name;
 
-    this.getDomNode().classList.add('file-element');
-    this.getDomNode().appendChild(this._iconDiv);
-    this.getDomNode().appendChild(this._title);
+    this.domNode.classList.add('file-element');
+    this.domNode.appendChild(this._iconDiv);
+    this.domNode.appendChild(this._title);
     //this._icon = document.createElement('img');
     this._fileModel = fileModel;
   }

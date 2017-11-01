@@ -15,9 +15,12 @@
   background-color: lightgray
 }
 
+.header-cell {
+  border: solid 1px black;
+}
+
 .header-cell:hover {
   background-color: #555555;
-  padding: 2px;
   color: white;
 }
 
@@ -28,9 +31,7 @@
 
 .sort-icon {
   width: 16px;
-  height: 16px;
   position: relative;
-  top: 3px;
   margin-left: 2px;
 }
 

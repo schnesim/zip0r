@@ -9,6 +9,14 @@
     background-color: lightyellow;
 }
 
+.menu-button:hover {
+    background-color: rgb(213,202,0);
+}
+
+.menu-button:active {
+    background-color: lightseagreen;
+}
+
 /* .menu-button.menu-button-add {
     background-image: url("./img/add.svg");
 } */

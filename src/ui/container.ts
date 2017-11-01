@@ -4,10 +4,12 @@ import { FileModel } from '../file/fileModel';
 import { Grid, GridConfig, GridColumn, GridColumnFactory } from './grid/grid';
 import { ZipController } from '../7z/zipController'
 import { ipcRenderer } from 'electron';
+import { IEventListener } from '../event/event'
 
-export class Container {
+export class Container implements IEventListener {
+  _callbacks: Function[];
 
-  private _domNode: HTMLElement;
+  private readonly _domNode: HTMLElement;
   private _menuBar: MenuBar;
   private _fileListContainer: FileListContainer;
   private _zipController: ZipController;
@@ -27,7 +29,9 @@ export class Container {
     const archiveContent = this._zipController.listArchiveContent(data);
     // this._fileListContainer = new FileListContainer(archiveContent);
     // this._domNode.appendChild(this._fileListContainer.getDomNode());
-    
+    if (this._grid) {
+      this._domNode.removeChild(this._grid.getDomNode());
+    }
     this._gridConfig = new GridConfig();
     this._gridConfig.addColumn(new GridColumnFactory().setTitle('Name').setWidth(20).setSortable(true).build());
     this._gridConfig.addColumn(new GridColumnFactory().setTitle('Size').setWidth(20).setSortable(true).build());

@@ -22,7 +22,7 @@ app.on('ready', function () {
   if (client !== void 0) {
     client.create(mainWindow);
   }
-  const menu = Menu.buildFromTemplate(template)
+  const menu = Menu.buildFromTemplate(menuTemplate)
   Menu.setApplicationMenu(menu)
 });
 
@@ -30,7 +30,7 @@ const openFileCallback = (files) => {
   mainWindow.webContents.send('archive-path', files);
 }
 
-const template: Array<object> = [
+const menuTemplate: Array<object> = [
   {
     label: 'File',
     submenu: [
@@ -108,7 +108,7 @@ const template: Array<object> = [
 
 if (process.platform === 'darwin') {
 
-  template.unshift({
+  menuTemplate.unshift({
     label: app.getName(),
     submenu: [
       { role: 'about' },
@@ -124,7 +124,7 @@ if (process.platform === 'darwin') {
   })
 
   // Edit menu
-  template[1]['submenu'].push(
+  menuTemplate[1]['submenu'].push(
     { type: 'separator' },
     {
       label: 'Speech',
@@ -136,7 +136,7 @@ if (process.platform === 'darwin') {
   )
 
   // Window menu
-  template[3]['submenu'] = [
+  menuTemplate[3]['submenu'] = [
     { role: 'close' },
     { role: 'minimize' },
     { role: 'zoom' },

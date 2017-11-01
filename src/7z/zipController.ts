@@ -47,7 +47,7 @@ export class ZipController {
         s = flatFile;
         const lines = s.split(os.EOL);
         const fileLines = [];
-        let index = 19;
+        let index = os.platform() === 'win32' ? 19 : 17;
         for (; index < lines.length; index++) {
             if (lines[index] === '------------------- ----- ------------ ------------  ------------------------') {
                 break;
