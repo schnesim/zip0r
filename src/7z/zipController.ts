@@ -1,37 +1,71 @@
 import * as child_process from 'child_process';
 import * as fs from 'fs';
 import * as os from 'os';
+import { remote } from 'electron';
 
 import { FileFactory } from '../file/fileFactory'
 import { FileModel } from '../file/fileModel'
+import { Result } from '../enum'
+import { ExtractWrapper } from '../helper/wrapper';
 
 export class ZipController {
 
     private _fileFactory: FileFactory;
+    private _7zPath: string;
 
     constructor() {
         this._fileFactory = new FileFactory();
+        if (os.platform() === 'darwin') {
+            this._7zPath = 'lib/darwin/7z/7za';
+        }
+        if (os.platform() === 'win32') {
+            this._7zPath = 'lib/win32/7z/7za.exe';
+        }
+    }
+
+    public extractFiles(wrapper: ExtractWrapper) {
+        const process = child_process.spawnSync(this._7zPath,
+            ['e', wrapper.archivePath, '-o' + wrapper.destDir, wrapper.filePaths.join(' ')],
+            { encoding: 'utf8' });
+
+        console.log(process.error)
+        const out = process.stdout;
+        const tmpResult = this.parseExtractFlatFile(out);
+        // todo: might be wise to check for existing files before starting the extraction
+        if (tmpResult === Result.OVERWRITE) {
+            remote.dialog.showMessageBox({
+                type: 'question',
+                buttons: ['Yes', 'No', 'Cancel'],
+                message: 'Overwrite existing files?'
+            }, this.extractFilesOverwrite.bind(this, wrapper));
+        }
+        console.log(out)
+    }
+
+    private extractFilesOverwrite(wrapper: ExtractWrapper, btnIndex: number) {
+        if (btnIndex === 0) {
+            const process = child_process.spawnSync(this._7zPath,
+                ['e', wrapper.archivePath, '-o' + wrapper.destDir, wrapper.filePaths.join(' '), '-aoa'],
+                { encoding: 'utf8' });
+            console.log(process.stdout);
+        } else if (btnIndex === 1) {
+            const process = child_process.spawnSync(this._7zPath,
+                ['e', wrapper.archivePath, '-o' + wrapper.destDir, wrapper.filePaths.join(' '), '-aos'],
+                { encoding: 'utf8' });
+            console.log(process.stdout);
+        }
     }
 
     public listArchiveContent(path: string): Array<FileModel> {
-        let process = void 0;
-        if (os.platform() === 'darwin') {
-            process = child_process.spawnSync('lib/darwin/7z/7za',
-                ['l', path], { encoding: 'utf8' });
-        }
-        if (os.platform() === 'win32') {
-            process = child_process.spawnSync('lib/win32/7za/7za.exe',
-                ['l', path], { encoding: 'utf8' });
-        }
-        const flatFile = process.stdout;
-        console.log(flatFile)
-        const files = this.parseFlatFile(flatFile);
+        const process = child_process.spawnSync(this._7zPath, ['l', path], { encoding: 'utf8' });
+        const files = this.parseContentFlatFile(process.stdout);
         return files;
     }
 
     public createZipFile(folder: string) {
         const process = child_process.spawn('lib/darwin/7z/7za',
             ['a', '/Volumes/RamDisk/test', '/Volumes/RamDisk/Cache']);
+        // For asynchronous processes the encoding has to be set afterwards
         process.stdout.setEncoding('utf8');
         process.stderr.setEncoding('utf8');
         process.stdout.on('data', (data) => {
@@ -42,7 +76,14 @@ export class ZipController {
         })
     }
 
-    private parseFlatFile(flatFile: string): Array<FileModel> {
+    private parseExtractFlatFile(flatFile: string): Result {
+        if (flatFile.indexOf('already exists') > -1) {
+            return Result.OVERWRITE;
+        }
+        return Result.SUCESS;
+    }
+
+    private parseContentFlatFile(flatFile: string): Array<FileModel> {
         let s = '';
         s = flatFile;
         const lines = s.split(os.EOL);

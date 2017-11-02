@@ -6,15 +6,22 @@
     background-size: 32px;
     background-repeat: no-repeat;
     background-position: center;
+}
+
+.menu-button-active {
     background-color: lightyellow;
 }
 
-.menu-button:hover {
+.menu-button-active:hover {
     background-color: rgb(213,202,0);
 }
 
-.menu-button:active {
+.menu-button-active:active {
     background-color: lightseagreen;
+}
+
+.menu-button-disabled {
+    background-color: rgb(155, 155, 155);
 }
 
 /* .menu-button.menu-button-add {

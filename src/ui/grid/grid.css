@@ -3,11 +3,15 @@
 }
 
 .row {
-  background-color: yellow;
+  background-color: lightyellow;
 }
 
 .row:hover {
   background-color: lightblue;
+}
+
+.row-selected {
+  background-color: yellow;
 }
 
 .header {

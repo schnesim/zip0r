@@ -1,5 +1,5 @@
 import { ViewElement } from '../viewElement'
-import { ViewEventEmitter } from '../viewEventEmitter'
+import { ViewEventEmitter } from '../viewEventEmitter';
 
 export class Grid {
 
@@ -36,9 +36,6 @@ export class Grid {
       let headerCell;
       headerCell = new HeaderCell(index === 0, index === gridConfig.getColumns().length - 1, column, columnCount);
       result.appendChild(headerCell.domNode);
-      // headerCell.registerCallback(this.tableHeaderCellCallback);
-      result.appendChild(headerCell.domNode);
-      //result.appendChild(this.createTableHeaderCell(column, columnCount));
       columnCount++;
     }
     return result;
@@ -73,8 +70,16 @@ export class Grid {
     });
   }
 
+  private deselectAll() {
+    for (let row of this._gridRows) {
+      row.selected = false;
+    }
+  }
+
   private tableRowClick(gridRow: GridRow, e: MouseEvent) {
     console.log(gridRow);
+    this.deselectAll();
+    gridRow.selected = true;
   }
 
   public addRow(rowData: Array<any>) {
@@ -87,6 +92,17 @@ export class Grid {
 
   public getDomNode(): HTMLTableElement {
     return this._domNode;
+  }
+
+  public getSelectedFilenames(): Array<string> {
+    const result = [];
+    this._gridRows.forEach(element => {
+      if (element.selected) {
+        // todo: replace array with properties
+        result.push(element.data[0]);
+      }
+    });
+    return result;
   }
 }
 
@@ -142,7 +158,7 @@ export class HeaderCell extends ViewElement {
     this._mouseEnter = false;
     this.domNode.style.cursor = 'default';
   }
-  
+
   private headerCellMouseMove(e: MouseEvent) {
     if (!this._mouseEnter) {
       return;
@@ -159,12 +175,12 @@ export class HeaderCell extends ViewElement {
 
   private withinFirstTenPercent(e: MouseEvent, position: ClientRect) {
     const leftBoundary = position.left;
-    const rightBoundary = position.left + position.width * 0.1;
+    const rightBoundary = position.left + 5;
     return e.screenX >= leftBoundary && e.screenX <= rightBoundary;
   }
 
   private withinLastTenPercent(e: MouseEvent, position: ClientRect) {
-    const leftBoundary = position.left + position.width * 0.9;
+    const leftBoundary = position.left + 5;
     const rightBoundary = position.left + position.width;
     return e.screenX >= leftBoundary && e.screenX <= rightBoundary;
   }
@@ -199,6 +215,7 @@ export class GridRow extends ViewElement {
 
   private _data: Array<any>;
   private _gridConfig: GridConfig;
+  private _selected: boolean;
 
   constructor(data: Array<any>, config: GridConfig, rowCount: number) {
     super();
@@ -219,6 +236,19 @@ export class GridRow extends ViewElement {
 
   get data(): Array<any> {
     return this._data;
+  }
+
+  get selected() {
+    return this._selected
+  }
+
+  set selected(value: boolean) {
+    this._selected = value;
+    if (value) {
+      this.domNode.classList.add('row-selected');
+    } else {
+      this.domNode.classList.remove('row-selected');
+    }
   }
 }
 

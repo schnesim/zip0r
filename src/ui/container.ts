@@ -1,32 +1,71 @@
+import { ipcRenderer, remote } from 'electron';
 import { MenuBar } from './menuBar';
+import { Callback, CallbackType } from './event'
 import { FileListContainer } from './fileListContainer';
 import { FileModel } from '../file/fileModel';
+import { ExtractWrapper } from '../helper/wrapper';
 import { Grid, GridConfig, GridColumn, GridColumnFactory } from './grid/grid';
-import { ZipController } from '../7z/zipController'
-import { ipcRenderer } from 'electron';
-import { IEventListener } from '../event/event'
+import { ZipController } from '../7z/zipController';
 
-export class Container implements IEventListener {
-  _callbacks: Function[];
-
+export class Container {
   private readonly _domNode: HTMLElement;
   private _menuBar: MenuBar;
   private _fileListContainer: FileListContainer;
   private _zipController: ZipController;
   private _grid: Grid;
   private _gridConfig: GridConfig;
+  private _archivePath: string = '';
+  private _lastDestDir: string = '';
 
   constructor() {
     this._domNode = document.createElement('div');
     this._domNode.className = 'container'
     this._menuBar = new MenuBar();
+    this._menuBar.registerCallback(new Callback(CallbackType.EXTRACT, this.btnExtractCallback.bind(this)));
     this._domNode.appendChild(this._menuBar.getDomNode());
     this._zipController = new ZipController();
     ipcRenderer.on('archive-path', this.listArchiveContent.bind(this));
+    this.enableDisableButtons();
   }
 
-  private listArchiveContent(event, data) {
-    const archiveContent = this._zipController.listArchiveContent(data);
+  private enableDisableButtons() {
+    if (this._archivePath === '') {
+      this._menuBar.disableBtnExtract();
+    } else {
+      this._menuBar.enableBtnExtract();
+    }
+  }
+
+  private selectDestinationCallback(destDir) {
+    if (destDir === void 0) {
+      return;
+    }
+    this._lastDestDir = destDir;
+    const selectedFiles = this._grid.getSelectedFilenames();
+    const extractWrapper = new ExtractWrapper(this._archivePath, destDir[0], selectedFiles);
+    this._zipController.extractFiles(extractWrapper);
+  }
+
+  private btnExtractCallback() {
+    let dir;
+    if (this._lastDestDir === '') {
+      dir = require('os').homedir();
+    } else {
+      dir = this._lastDestDir;
+    }
+    remote.dialog.showOpenDialog({
+      title: 'Open archive',
+      defaultPath: dir + '',
+      filters: [
+        { name: 'All Files', extensions: ['*'] }
+      ],
+      properties: ['openDirectory']
+    }, this.selectDestinationCallback.bind(this));
+  }
+
+  private listArchiveContent(event, archivePath) {
+    this._archivePath = archivePath;
+    const archiveContent = this._zipController.listArchiveContent(archivePath);
     // this._fileListContainer = new FileListContainer(archiveContent);
     // this._domNode.appendChild(this._fileListContainer.getDomNode());
     if (this._grid) {
@@ -41,6 +80,7 @@ export class Container implements IEventListener {
       this._grid.addRow([content.name, content.size, content.compressedSize]);
     }
     this._domNode.appendChild(this._grid.getDomNode());
+    this.enableDisableButtons();
   }
 
   public getDomNode(): HTMLElement {
