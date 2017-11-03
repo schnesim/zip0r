@@ -176,13 +176,13 @@ export class HeaderCell extends ViewElement {
   private withinFirstTenPercent(e: MouseEvent, position: ClientRect) {
     const leftBoundary = position.left;
     const rightBoundary = position.left + 5;
-    return e.screenX >= leftBoundary && e.screenX <= rightBoundary;
+    return e.screenX >= leftBoundary && e.screenX <= rightBoundary && !this._isFirst;
   }
 
   private withinLastTenPercent(e: MouseEvent, position: ClientRect) {
-    const leftBoundary = position.left + 5;
-    const rightBoundary = position.left + position.width;
-    return e.screenX >= leftBoundary && e.screenX <= rightBoundary;
+    const leftBoundary = position.right - 5;
+    const rightBoundary = position.right;
+    return e.screenX >= leftBoundary && e.screenX <= rightBoundary && !this._isLast;
   }
 
   private headerCellClick(e: MouseEvent) {

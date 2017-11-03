@@ -9,6 +9,7 @@ export class MenuBar {
     private _callbacks: Callback[];
     constructor() {
         this._domNode = document.createElement('div');
+        this._domNode.classList.add('menu-bar');
         this._callbacks = [];
         this.createButtons();
     }

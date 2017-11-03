@@ -1,27 +1,39 @@
+.menu-bar {
+    margin: 10px;
+    border: solid 2px grey;
+}
+
 .menu-button {
     width: 6em;
     height: 3em;
-    border: solid 1px green;
+    border: solid 1px rgb(107, 107, 107);
     float: left;
-    background-size: 32px;
+    color: white;
+    text-align: center;
+    line-height: 39px;
+    background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .menu-button-active {
-    background-color: lightyellow;
+    /* background-color: lightyellow; */
+    background-image: linear-gradient(to bottom, rgb(255, 255, 255) 15%, rgb(124, 124, 124));
 }
 
 .menu-button-active:hover {
-    background-color: rgb(213,202,0);
+    /* background-color: rgb(213,202,0); */
+    background-image: linear-gradient(to bottom, rgb(255, 255, 255) 15%, rgb(179, 179, 179));
 }
 
 .menu-button-active:active {
-    background-color: lightseagreen;
+    /* background-color: lightseagreen; */
+    background-image: linear-gradient(to bottom, rgb(124, 124, 124) 15%, rgb(255, 255, 255));
 }
 
 .menu-button-disabled {
     background-color: rgb(155, 155, 155);
+    color: rgb(201, 201, 201);
 }
 
 /* .menu-button.menu-button-add {

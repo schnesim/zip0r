@@ -16,10 +16,10 @@ export class ZipController {
     constructor() {
         this._fileFactory = new FileFactory();
         if (os.platform() === 'darwin') {
-            this._7zPath = 'lib/darwin/7z/7za';
+            this._7zPath = 'lib/darwin/7z/7z';
         }
         if (os.platform() === 'win32') {
-            this._7zPath = 'lib/win32/7z/7za.exe';
+            this._7zPath = 'lib/win32/7z/7z.exe';
         }
     }
 
@@ -56,9 +56,11 @@ export class ZipController {
         }
     }
 
-    public listArchiveContent(path: string): Array<FileModel> {
+    public openArchive(path: string): Array<FileModel> {
         const process = child_process.spawnSync(this._7zPath, ['l', path], { encoding: 'utf8' });
-        const files = this.parseContentFlatFile(process.stdout);
+        const out = process.stdout;
+        console.log(out)
+        const files = this.parseContentFlatFile(out);
         return files;
     }
 

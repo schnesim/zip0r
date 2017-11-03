@@ -11,11 +11,10 @@ let container;
 
 document.addEventListener('DOMContentLoaded', function () {
   container = new Container();
-  document.getElementsByTagName('body')[0].appendChild(container.getDomNode());
-
-
-  // const z = new ZipController();
-  // z.listArchiveContent('zip0r.7z');
+  const body = document.getElementsByTagName('body')[0];
+  body.appendChild(container.getDomNode());
+  // prevent selecting text by double clicking
+  body.addEventListener('mousedown', (e) => { e.preventDefault() });
 
   const menu = new Menu()
   menu.append(new MenuItem({ label: 'MenuItem1', click() { console.log('item 1 clicked') } }))

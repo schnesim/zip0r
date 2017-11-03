@@ -13,6 +13,7 @@ export class Container {
   private _fileListContainer: FileListContainer;
   private _zipController: ZipController;
   private _grid: Grid;
+  private _gridContainer: HTMLDivElement;
   private _gridConfig: GridConfig;
   private _archivePath: string = '';
   private _lastDestDir: string = '';
@@ -65,7 +66,7 @@ export class Container {
 
   private listArchiveContent(event, archivePath) {
     this._archivePath = archivePath;
-    const archiveContent = this._zipController.listArchiveContent(archivePath);
+    const archiveContent = this._zipController.openArchive(archivePath);
     // this._fileListContainer = new FileListContainer(archiveContent);
     // this._domNode.appendChild(this._fileListContainer.getDomNode());
     if (this._grid) {
@@ -79,7 +80,10 @@ export class Container {
     for (let content of archiveContent) {
       this._grid.addRow([content.name, content.size, content.compressedSize]);
     }
-    this._domNode.appendChild(this._grid.getDomNode());
+    this._gridContainer = document.createElement('div');
+    this._gridContainer.classList.add('grid-container');
+    this._gridContainer.appendChild(this._grid.getDomNode());
+    this._domNode.appendChild(this._gridContainer);
     this.enableDisableButtons();
   }
 
