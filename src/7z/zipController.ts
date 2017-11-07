@@ -19,7 +19,7 @@ export class ZipController {
             this._7zPath = 'lib/darwin/7z/7za';
         }
         if (os.platform() === 'win32') {
-            this._7zPath = 'lib/win32/7z/7za.exe';
+            this._7zPath = 'lib/win32/7z/7z.exe';
         }
     }
 

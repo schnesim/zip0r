@@ -1,5 +1,6 @@
 import { ViewElement } from '../viewElement'
 import { ViewEventEmitter } from '../viewEventEmitter';
+import { ArchiveEntry } from '../../helper/wrapper';
 
 export class Grid {
 
@@ -82,8 +83,9 @@ export class Grid {
     gridRow.selected = true;
   }
 
-  public addRow(rowData: Array<any>) {
-    const gridRow = new GridRow(rowData, this._gridConfig, this._rowCount);
+  // public addRow(rowData: Array<any>) {
+  public addRow(archiveEntry: ArchiveEntry) {
+    const gridRow = new GridRow(archiveEntry, this._gridConfig, this._rowCount);
     gridRow.domNode.addEventListener('click', this.tableRowClick.bind(this, gridRow));
     this._domNode.appendChild(gridRow.domNode);
     this._gridRows.push(gridRow);
@@ -214,24 +216,40 @@ export class GridConfig {
 export class GridRow extends ViewElement {
 
   private _data: Array<any>;
+  private _archiveEntry: ArchiveEntry;
   private _gridConfig: GridConfig;
   private _selected: boolean;
 
-  constructor(data: Array<any>, config: GridConfig, rowCount: number) {
+  constructor(archiveEntry: ArchiveEntry, config: GridConfig, rowCount: number) {
     super();
-    this._data = data;
+    this._archiveEntry = archiveEntry;
     this._gridConfig = config;
-    const row = document.createElement('tr');
-    row.classList.add('row');
-    row.setAttribute('rowNumber', String(rowCount));
-    this.domNode = row;
-    for (var index = 0; index < data.length; index++) {
-      const td = document.createElement('td');
-      td.style.width = this._gridConfig.getColumns()[index].width;
-      td.classList.add('data');
-      td.innerText = data[index];
-      this.domNode.appendChild(td);
-    }
+    this.domNode = document.createElement('tr');
+    this.domNode.classList.add('row');
+    this.domNode.setAttribute('rowNumber', String(rowCount));
+    
+    const icon = document.createElement('div');
+    icon.classList.add('row-icon');
+    icon.classList.add('row-icon-file');
+    
+    const td = this.createTd(this._archiveEntry.filename, this._gridConfig.getColumns()[0].width)
+    const name = document.createElement('div');
+    name.innerText = this._archiveEntry.filename;
+
+    const iconAndFilename = document.createElement('td');
+    iconAndFilename.appendChild(icon);
+    iconAndFilename.appendChild(name);
+    this.domNode.appendChild(iconAndFilename);
+    this.domNode.appendChild(this.createTd(this._archiveEntry.size, this._gridConfig.getColumns()[1].width));
+    this.domNode.appendChild(this.createTd(this._archiveEntry.compressedSize, this._gridConfig.getColumns()[2].width));
+  }
+  
+  private createTd(innerText, width: string): HTMLTableDataCellElement {
+    const td = document.createElement('td');
+    td.style.width = width;
+    td.classList.add('data');
+    td.innerText = innerText;
+    return td;
   }
 
   get data(): Array<any> {

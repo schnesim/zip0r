@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', function () {
   container = new Container();
   document.getElementsByTagName('body')[0].appendChild(container.getDomNode());
 
-
   // const z = new ZipController();
   // z.listArchiveContent('zip0r.7z');
 
@@ -25,4 +24,6 @@ document.addEventListener('DOMContentLoaded', function () {
     e.preventDefault()
     menu.popup(remote.getCurrentWindow())
   }, false)
+
+  container.listArchiveContent(void 0, "zip0r.7z");
 });

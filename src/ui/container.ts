@@ -3,7 +3,7 @@ import { MenuBar } from './menuBar';
 import { Callback, CallbackType } from './event'
 import { FileListContainer } from './fileListContainer';
 import { FileModel } from '../file/fileModel';
-import { ExtractWrapper } from '../helper/wrapper';
+import { ExtractWrapper, ArchiveEntry } from '../helper/wrapper';
 import { Grid, GridConfig, GridColumn, GridColumnFactory } from './grid/grid';
 import { ZipController } from '../7z/zipController';
 
@@ -63,7 +63,7 @@ export class Container {
     }, this.selectDestinationCallback.bind(this));
   }
 
-  private listArchiveContent(event, archivePath) {
+  public listArchiveContent(event, archivePath) {
     this._archivePath = archivePath;
     const archiveContent = this._zipController.listArchiveContent(archivePath);
     // this._fileListContainer = new FileListContainer(archiveContent);
@@ -72,12 +72,13 @@ export class Container {
       this._domNode.removeChild(this._grid.getDomNode());
     }
     this._gridConfig = new GridConfig();
-    this._gridConfig.addColumn(new GridColumnFactory().setTitle('Name').setWidth(20).setSortable(true).build());
+    this._gridConfig.addColumn(new GridColumnFactory().setTitle('Name').setWidth(120).setSortable(true).build());
     this._gridConfig.addColumn(new GridColumnFactory().setTitle('Size').setWidth(20).setSortable(true).build());
     this._gridConfig.addColumn(new GridColumnFactory().setTitle('Compressed Size').setWidth(200).setSortable(false).build());
     this._grid = new Grid(this._gridConfig);
     for (let content of archiveContent) {
-      this._grid.addRow([content.name, content.size, content.compressedSize]);
+      this._grid.addRow(new ArchiveEntry(content.name, content.size, content.compressedSize));
+      // this._grid.addRow([content.name, content.size, content.compressedSize]);
     }
     this._domNode.appendChild(this._grid.getDomNode());
     this.enableDisableButtons();
