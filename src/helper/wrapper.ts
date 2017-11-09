@@ -8,3 +8,14 @@ export class ExtractWrapper {
     this.filePaths = filePaths;
   }
 }
+
+export class ArchiveEntry {
+  public filename: string;
+  public size: number;
+  public compressedSize: number;
+  constructor(filename: string, size, compressedSize: number) {
+    this.filename = filename;
+    this.size = size;
+    this.compressedSize = compressedSize;
+  }
+}

@@ -11,6 +11,7 @@ let container;
 
 document.addEventListener('DOMContentLoaded', function () {
   container = new Container();
+
   const body = document.getElementsByTagName('body')[0];
   body.appendChild(container.getDomNode());
   // prevent selecting text by double clicking
@@ -24,4 +25,6 @@ document.addEventListener('DOMContentLoaded', function () {
     e.preventDefault()
     menu.popup(remote.getCurrentWindow())
   }, false)
+
+  container.listArchiveContent(void 0, "zip0r.7z");
 });
