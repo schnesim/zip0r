@@ -26,5 +26,5 @@ document.addEventListener('DOMContentLoaded', function () {
     menu.popup(remote.getCurrentWindow())
   }, false)
 
-  container.listArchiveContent(void 0, "zip0r.7z");
+  container.populateGrid(void 0, "zip0r.7z");
 });

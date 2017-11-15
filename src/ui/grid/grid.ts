@@ -1,6 +1,7 @@
 import { ViewElement } from '../viewElement'
 import { ViewEventEmitter } from '../viewEventEmitter';
 import { ArchiveEntry } from '../../helper/wrapper';
+import { ZipController } from '../../7z/zipController';
 
 export class Grid {
 
@@ -12,12 +13,15 @@ export class Grid {
   private _gridConfig: GridConfig;
   private _columnCount: number;
   private _rowCount: number;
+  private _archivePath: string;
+  private _zipController: ZipController;
 
   constructor(gridConfig: GridConfig) {
     this._gridConfig = gridConfig;
     this._rowCount = 0;
     this._gridRows = [];
     this._gridHeaderRow = [];
+    this._zipController = new ZipController();
     this._tableHeaderRow = this.createTableHeaderRow(gridConfig);
 
     this._tableHead = document.createElement('thead');
@@ -42,8 +46,10 @@ export class Grid {
     return result;
   }
 
-  private tableHeaderCellCallback() {
-
+  set archivePath(value: string) {
+    this._archivePath = value;
+    this._zipController.openArchive
+    this.refresh();
   }
 
   private refresh() {
@@ -83,10 +89,18 @@ export class Grid {
     gridRow.selected = true;
   }
 
+  private tableRowDblClick(gridRow: GridRow, e: MouseEvent) {
+    // todo: Check if charakter for separating folders is the same on windows.
+    if (gridRow.data.filename.includes('/')) {
+
+    }
+  }
+
   // public addRow(rowData: Array<any>) {
   public addRow(archiveEntry: ArchiveEntry) {
     const gridRow = new GridRow(archiveEntry, this._gridConfig, this._rowCount);
     gridRow.domNode.addEventListener('click', this.tableRowClick.bind(this, gridRow));
+    gridRow.domNode.addEventListener('dblclick', this.tableRowDblClick.bind(this, gridRow));
     this._domNode.appendChild(gridRow.domNode);
     this._gridRows.push(gridRow);
     this._rowCount++;
@@ -215,10 +229,11 @@ export class GridConfig {
 
 export class GridRow extends ViewElement {
 
-  private _data: Array<any>;
+  // private _data: Array<any>;
   private _archiveEntry: ArchiveEntry;
   private _gridConfig: GridConfig;
   private _selected: boolean;
+  private _doubleClickCallback: Function;
 
   constructor(archiveEntry: ArchiveEntry, config: GridConfig, rowCount: number) {
     super();
@@ -227,24 +242,37 @@ export class GridRow extends ViewElement {
     this.domNode = document.createElement('tr');
     this.domNode.classList.add('row');
     this.domNode.setAttribute('rowNumber', String(rowCount));
-    
+
     const icon = document.createElement('div');
     icon.classList.add('row-icon');
-    icon.classList.add('row-icon-file');
-    
-    const td = this.createTd(this._archiveEntry.filename, this._gridConfig.getColumns()[0].width)
+    icon.classList.add('row-icon-folder');
+
+
     const name = document.createElement('div');
+    name.className = 'row-entry-name';
     name.innerText = this._archiveEntry.filename;
 
     const iconAndFilename = document.createElement('td');
-    iconAndFilename.appendChild(icon);
-    iconAndFilename.appendChild(name);
+    iconAndFilename.addEventListener('dblclick', this.entryDoubleClick.bind(this));
+    iconAndFilename.classList.add('data');
+    // For unknown reasons, setting td:display:flex causes too wide borders. So we have to use a wrapper
+    // to get flex working properly.
+    const wrapperDiv = document.createElement('div');
+    wrapperDiv.classList.add('row-icon-and-filename');
+    wrapperDiv.appendChild(icon)
+    wrapperDiv.appendChild(name)
+    iconAndFilename.appendChild(wrapperDiv);
+
     this.domNode.appendChild(iconAndFilename);
-    this.domNode.appendChild(this.createTd(this._archiveEntry.size, this._gridConfig.getColumns()[1].width));
-    this.domNode.appendChild(this.createTd(this._archiveEntry.compressedSize, this._gridConfig.getColumns()[2].width));
+    this.domNode.appendChild(this.createTableCell(this._archiveEntry.size, this._gridConfig.getColumns()[1].width));
+    this.domNode.appendChild(this.createTableCell(this._archiveEntry.compressedSize, this._gridConfig.getColumns()[2].width));
   }
-  
-  private createTd(innerText, width: string): HTMLTableDataCellElement {
+
+  private entryDoubleClick() {
+
+  }
+
+  private createTableCell(innerText, width: string): HTMLTableDataCellElement {
     const td = document.createElement('td');
     td.style.width = width;
     td.classList.add('data');
@@ -252,8 +280,12 @@ export class GridRow extends ViewElement {
     return td;
   }
 
-  get data(): Array<any> {
-    return this._data;
+  public registerCellDoubleClickCallback(callback: Function) {
+    this._doubleClickCallback = callback;
+  }
+
+  get data(): ArchiveEntry {
+    return this._archiveEntry;
   }
 
   get selected() {

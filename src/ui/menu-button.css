@@ -17,22 +17,19 @@
 }
 
 .menu-button-active {
-    /* background-color: lightyellow; */
-    background-image: linear-gradient(to bottom, rgb(255, 255, 255) 15%, rgb(124, 124, 124));
+    background-color: #afafaf;
 }
 
 .menu-button-active:hover {
-    /* background-color: rgb(213,202,0); */
-    background-image: linear-gradient(to bottom, rgb(255, 255, 255) 15%, rgb(179, 179, 179));
+    background-color: #cacaca;
 }
 
 .menu-button-active:active {
-    /* background-color: lightseagreen; */
-    background-image: linear-gradient(to bottom, rgb(124, 124, 124) 15%, rgb(255, 255, 255));
+    background-color: #dddddd;
 }
 
 .menu-button-disabled {
-    background-color: rgb(155, 155, 155);
+    background-color: rgb(183, 183, 183);
     color: rgb(201, 201, 201);
 }
 

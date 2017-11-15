@@ -13,6 +13,7 @@ export class Container {
   private _fileListContainer: FileListContainer;
   private _zipController: ZipController;
   private _grid: Grid;
+  // We need a container for the grid in order to center it on the site.
   private _gridContainer: HTMLDivElement;
   private _gridConfig: GridConfig;
   private _archivePath: string = '';
@@ -25,7 +26,7 @@ export class Container {
     this._menuBar.registerCallback(new Callback(CallbackType.EXTRACT, this.btnExtractCallback.bind(this)));
     this._domNode.appendChild(this._menuBar.getDomNode());
     this._zipController = new ZipController();
-    ipcRenderer.on('archive-path', this.listArchiveContent.bind(this));
+    ipcRenderer.on('archive-path', this.populateGrid.bind(this));
     this.enableDisableButtons();
   }
 
@@ -64,22 +65,21 @@ export class Container {
     }, this.selectDestinationCallback.bind(this));
   }
 
-  public listArchiveContent(event, archivePath) {
-    this._archivePath = archivePath;
-    const archiveContent = this._zipController.openArchive(archivePath);
-    // this._fileListContainer = new FileListContainer(archiveContent);
-    // this._domNode.appendChild(this._fileListContainer.getDomNode());
+  public populateGrid(event, archivePath) {
+    // this._archivePath = archivePath;
+    // const archiveContent = this._zipController.openArchive(archivePath);
     if (this._grid) {
-      this._domNode.removeChild(this._grid.getDomNode());
+      this._domNode.removeChild(this._gridContainer);
     }
     this._gridConfig = new GridConfig();
     this._gridConfig.addColumn(new GridColumnFactory().setTitle('Name').setWidth(120).setSortable(true).build());
     this._gridConfig.addColumn(new GridColumnFactory().setTitle('Size').setWidth(20).setSortable(true).build());
     this._gridConfig.addColumn(new GridColumnFactory().setTitle('Compressed Size').setWidth(200).setSortable(false).build());
     this._grid = new Grid(this._gridConfig);
+    this._grid.archivePath = archivePath;
+
     for (let content of archiveContent) {
       this._grid.addRow(new ArchiveEntry(content.name, content.size, content.compressedSize));
-      // this._grid.addRow([content.name, content.size, content.compressedSize]);
     }
     this._gridContainer = document.createElement('div');
     this._gridContainer.classList.add('grid-container');

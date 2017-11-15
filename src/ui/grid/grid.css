@@ -15,22 +15,36 @@
   background-color: yellow;
 }
 
+.row-icon-and-filename {
+  display: flex;
+  align-items: center;
+}
+
+.row-entry-name {
+  float: left;
+  margin-left: 5px;
+  width: 90%;
+}
+
 .row-icon {
-  width: 16px;
+  float: left;
+  width: 20px;
+  height: 24px;
   background-position-x: center;
   background-position-y: center;
   background-repeat: no-repeat;
-  background-size: 24px;
-  border: solid 1px black;
-  border-right: solid 1px rgba(0,0,0,0);
+  /* border: solid 1px black;
+  border-right: solid 1px rgba(0,0,0,0); */
 }
 
 .row-icon-file {
   background-image: url("./img/file.svg");
+  background-size: 22px;
 }
 
 .row-icon-folder {
-  background-image: url("./img/file.svg");
+  background-image: url("./img/folder.svg");
+  background-size: 20px;
 }
 
 .header {
@@ -49,7 +63,7 @@
 
 .data {
   border: solid 1px black;
-  padding: 5px;
+  /* padding: 5px; */
 }
 
 .sort-icon {
