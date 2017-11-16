@@ -2,6 +2,7 @@ import { ViewElement } from '../viewElement'
 import { ViewEventEmitter } from '../viewEventEmitter';
 import { ArchiveEntry } from '../../helper/wrapper';
 import { ZipController } from '../../7z/zipController';
+import { FileModel } from '../../file/fileModel';
 
 export class Grid {
 
@@ -12,13 +13,12 @@ export class Grid {
   private _gridRows: Array<GridRow>;
   private _gridConfig: GridConfig;
   private _columnCount: number;
-  private _rowCount: number;
   private _archivePath: string;
+  private _archiveContent: Array<FileModel>;
   private _zipController: ZipController;
 
   constructor(gridConfig: GridConfig) {
     this._gridConfig = gridConfig;
-    this._rowCount = 0;
     this._gridRows = [];
     this._gridHeaderRow = [];
     this._zipController = new ZipController();
@@ -38,8 +38,7 @@ export class Grid {
     let columnCount = 0;
     for (var index = 0; index < gridConfig.getColumns().length; index++) {
       var column = gridConfig.getColumns()[index];
-      let headerCell;
-      headerCell = new HeaderCell(index === 0, index === gridConfig.getColumns().length - 1, column, columnCount);
+      const headerCell = new HeaderCell(index === 0, index === gridConfig.getColumns().length - 1, column, columnCount);
       result.appendChild(headerCell.domNode);
       columnCount++;
     }
@@ -47,8 +46,13 @@ export class Grid {
   }
 
   set archivePath(value: string) {
+    this._gridRows = [];
     this._archivePath = value;
-    this._zipController.openArchive
+    this._archiveContent = this._zipController.openArchive(value);
+    this._archiveContent.forEach(entry => {
+      const archiveEntry = new ArchiveEntry(entry.name, entry.size, entry.compressedSize);
+      this._gridRows.push(new GridRow(archiveEntry, this._gridConfig, this._gridRows.length));
+    })
     this.refresh();
   }
 
@@ -97,13 +101,13 @@ export class Grid {
   }
 
   // public addRow(rowData: Array<any>) {
-  public addRow(archiveEntry: ArchiveEntry) {
-    const gridRow = new GridRow(archiveEntry, this._gridConfig, this._rowCount);
+  public createGridRow(archiveEntry: ArchiveEntry): GridRow {
+    const gridRow = new GridRow(archiveEntry, this._gridConfig, this._gridRows.length);
     gridRow.domNode.addEventListener('click', this.tableRowClick.bind(this, gridRow));
     gridRow.domNode.addEventListener('dblclick', this.tableRowDblClick.bind(this, gridRow));
-    this._domNode.appendChild(gridRow.domNode);
-    this._gridRows.push(gridRow);
-    this._rowCount++;
+    // this._domNode.appendChild(gridRow.domNode);
+    // this._gridRows.push(gridRow);
+    return gridRow;
   }
 
   public getDomNode(): HTMLTableElement {

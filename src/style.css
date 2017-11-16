@@ -7,6 +7,10 @@ html, body {
 		cursor: default;
 }
 
+body {
+	background-color: rgb(240, 240, 240);
+}
+
 .button {
 	display: inline-block;
 	text-decoration: none;

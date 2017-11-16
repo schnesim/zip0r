@@ -11,7 +11,7 @@ export class Container {
   private readonly _domNode: HTMLElement;
   private _menuBar: MenuBar;
   private _fileListContainer: FileListContainer;
-  private _zipController: ZipController;
+  // private _zipController: ZipController;
   private _grid: Grid;
   // We need a container for the grid in order to center it on the site.
   private _gridContainer: HTMLDivElement;
@@ -25,7 +25,7 @@ export class Container {
     this._menuBar = new MenuBar();
     this._menuBar.registerCallback(new Callback(CallbackType.EXTRACT, this.btnExtractCallback.bind(this)));
     this._domNode.appendChild(this._menuBar.getDomNode());
-    this._zipController = new ZipController();
+    // this._zipController = new ZipController();
     ipcRenderer.on('archive-path', this.populateGrid.bind(this));
     this.enableDisableButtons();
   }
@@ -78,9 +78,9 @@ export class Container {
     this._grid = new Grid(this._gridConfig);
     this._grid.archivePath = archivePath;
 
-    for (let content of archiveContent) {
-      this._grid.addRow(new ArchiveEntry(content.name, content.size, content.compressedSize));
-    }
+    // for (let content of archiveContent) {
+    //   this._grid.addRow(new ArchiveEntry(content.name, content.size, content.compressedSize));
+    // }
     this._gridContainer = document.createElement('div');
     this._gridContainer.classList.add('grid-container');
     this._gridContainer.appendChild(this._grid.getDomNode());

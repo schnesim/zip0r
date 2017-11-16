@@ -5,6 +5,8 @@ export class FileModel {
   private _size: number;
   private _compressedSize: number;
   private _name: string;
+  private _children: Array<FileModel>;
+  //private _parent: FileModel;
 
   constructor(timestamp: string, attribute: string, size: number, compressedSize: number, name: string) {
     this._timestamp = timestamp;
@@ -12,6 +14,7 @@ export class FileModel {
     this._size = size;
     this._compressedSize = isNaN(compressedSize) ? 0 : compressedSize;
     this._name = name;
+    this._children = [];
   }
 
   get timestamp(): string {
@@ -32,6 +35,10 @@ export class FileModel {
 
   get name(): string {
     return this._name;
+  }
+
+  get children(): Array<FileModel> {
+    return this._children;
   }
 
 }
