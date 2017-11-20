@@ -9,23 +9,26 @@ export class FileModelFactory {
     private readonly IDX_COMPRESSED_SIZE: number = 3;
     private readonly IDX_NAME: number = 4;
 
-    public createFileModel(line: string): FileModel {
-        const lineArray = this.parseLine(line);
-        const time = lineArray[this.IDX_TIMESTAMP];
-        const attr = lineArray[this.IDX_ATTRIBUTE];
-        const size = parseInt(lineArray[this.IDX_SIZE]);
-        const cSize = parseInt(lineArray[this.IDX_COMPRESSED_SIZE]);
-        const name = lineArray[this.IDX_NAME];
-        let result = void 0;
-        if (name.indexOf(path.delimiter) > -1) {
-            const pathParts = name.split(path.delimiter).reverse();
-            result = this.createDeepFileModel(time, attr, size, cSize, pathParts);
-        } else {
-            
-            result = new FileModel(lineArray[0], lineArray[1], parseInt(lineArray[2]), parseInt(lineArray[3]), lineArray[4]);
-        }
-        return result;
+    public createFileModel(fileLines: Array<string>): FileModel {
+        // As of right now, every view of the grid should correspond to exactly one FileModel object.
     }
+    // public createFileModel(line: string): FileModel {
+    //     const lineArray = this.parseLine(line);
+    //     const time = lineArray[this.IDX_TIMESTAMP];
+    //     const attr = lineArray[this.IDX_ATTRIBUTE];
+    //     const size = parseInt(lineArray[this.IDX_SIZE]);
+    //     const cSize = parseInt(lineArray[this.IDX_COMPRESSED_SIZE]);
+    //     const name = lineArray[this.IDX_NAME];
+    //     let result = void 0;
+    //     if (name.indexOf(path.delimiter) > -1) {
+    //         const pathParts = name.split(path.delimiter).reverse();
+    //         result = this.createDeepFileModel(time, attr, size, cSize, pathParts);
+    //     } else {
+            
+    //         result = new FileModel(lineArray[0], lineArray[1], parseInt(lineArray[2]), parseInt(lineArray[3]), lineArray[4]);
+    //     }
+    //     return result;
+    // }
     
     private createDeepFileModel(time: string, attr: string, size: number, cSize: number, pathParts: Array<string>): FileModel {
         console.log(pathParts);

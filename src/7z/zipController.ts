@@ -56,12 +56,12 @@ export class ZipController {
     }
   }
 
-  public openArchive(path: string): Array<FileModel> {
+  public openArchive(path: string): FileModel {
     const process = child_process.spawnSync(this._7zPath, ['l', path], { encoding: 'utf8' });
     const out = process.stdout;
     console.log(out)
-    const files = this.parseContentFlatFile(out);
-    return files;
+    const rootFileModel = this.parseContentFlatFile(out);
+    return rootFileModel;
   }
 
   public createZipFile(folder: string) {
@@ -85,7 +85,7 @@ export class ZipController {
     return Result.SUCESS;
   }
 
-  private parseContentFlatFile(flatFile: string): Array<FileModel> {
+  private parseContentFlatFile(flatFile: string): FileModel {
     let s = '';
     s = flatFile;
     const lines = s.split(os.EOL);
@@ -101,11 +101,11 @@ export class ZipController {
     }
     index++;
     const summary = lines[index];
-    const files = [];
-    for (let file of fileLines) {
-      files.push(this._fileFactory.createFileModel(file));
-    }
-    return files;
+    const rootFileModel = this._fileFactory.createFileModel(fileLines);
+    // for (let file of fileLines) {
+    //   files.push(this._fileFactory.createFileModel(file));
+    // }
+    return rootFileModel;
   }
 
   private extractType(fileLines: Array<string>): string {

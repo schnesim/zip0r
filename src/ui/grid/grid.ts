@@ -14,7 +14,7 @@ export class Grid {
   private _gridConfig: GridConfig;
   private _columnCount: number;
   private _archivePath: string;
-  private _archiveContent: Array<FileModel>;
+  private _archiveContent: FileModel;
   private _zipController: ZipController;
 
   constructor(gridConfig: GridConfig) {
@@ -49,7 +49,7 @@ export class Grid {
     this._gridRows = [];
     this._archivePath = value;
     this._archiveContent = this._zipController.openArchive(value);
-    this._archiveContent.forEach(entry => {
+    this._archiveContent.children.forEach(entry => {
       const archiveEntry = new ArchiveEntry(entry.name, entry.size, entry.compressedSize);
       this._gridRows.push(new GridRow(archiveEntry, this._gridConfig, this._gridRows.length));
     })
