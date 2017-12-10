@@ -1,52 +1,88 @@
 import * as path from 'path';
-import { FileModel } from './fileModel';
+import { FileModel, FileModelBuilder } from './fileModel';
+import { Constants } from '../constants';
 
 export class FileModelFactory {
 
-    private readonly IDX_TIMESTAMP: number = 0;
-    private readonly IDX_ATTRIBUTE: number = 1;
-    private readonly IDX_SIZE: number = 2;
-    private readonly IDX_COMPRESSED_SIZE: number = 3;
-    private readonly IDX_NAME: number = 4;
+  private readonly IDX_TIMESTAMP: number = 0;
+  private readonly IDX_ATTRIBUTE: number = 1;
+  private readonly IDX_SIZE: number = 2;
+  private readonly IDX_COMPRESSED_SIZE: number = 3;
+  private readonly IDX_NAME: number = 4;
 
-    public createFileModel(fileLines: Array<string>): FileModel {
-        // As of right now, every view of the grid should correspond to exactly one FileModel object.
+  public createFileModel(lines: string[]): FileModel {
+    let rootFileModel = new FileModel();
+    for (let line of lines) {
+      const lineArray = this.parseLine(line);
+      const name = lineArray[this.IDX_NAME];
+      if (name.indexOf(Constants.PATH_SEPARATOR) > -1) {
+        const pathParts = name.split(Constants.PATH_SEPARATOR);
+        this.createDeepFileModel(rootFileModel, pathParts, lineArray);
+      } else {
+        rootFileModel.children.push(this.buildModel(lineArray));
+      }
     }
-    // public createFileModel(line: string): FileModel {
-    //     const lineArray = this.parseLine(line);
-    //     const time = lineArray[this.IDX_TIMESTAMP];
-    //     const attr = lineArray[this.IDX_ATTRIBUTE];
-    //     const size = parseInt(lineArray[this.IDX_SIZE]);
-    //     const cSize = parseInt(lineArray[this.IDX_COMPRESSED_SIZE]);
-    //     const name = lineArray[this.IDX_NAME];
-    //     let result = void 0;
-    //     if (name.indexOf(path.delimiter) > -1) {
-    //         const pathParts = name.split(path.delimiter).reverse();
-    //         result = this.createDeepFileModel(time, attr, size, cSize, pathParts);
-    //     } else {
-            
-    //         result = new FileModel(lineArray[0], lineArray[1], parseInt(lineArray[2]), parseInt(lineArray[3]), lineArray[4]);
-    //     }
-    //     return result;
-    // }
-    
-    private createDeepFileModel(time: string, attr: string, size: number, cSize: number, pathParts: Array<string>): FileModel {
-        console.log(pathParts);
-        const result = new FileModel(time, attr, size, cSize, pathParts.pop());
-        if (pathParts.length > 0) {
-            result.children.push
-        }
-        return result;
-    }
+    return rootFileModel;
+  }
 
-    private parseLine(line): Array<string> {
-        let s = line;//'2017-09-13 09:58:58 ....A          650          459  package.json'
-        const lines = [];
-        lines.push(s.substr(0, 19));                    // timestamp
-        lines.push(s.substr(20, 5).replace(/\./g, '')); // attribute
-        lines.push(s.substr(26, 12).trim());            // size
-        lines.push(s.substr(39, 12).trim());            // compressed size
-        lines.push(s.substr(53, s.length));             // name
-        return lines;
+  private buildModel(lineArray: Array<string>): FileModel {
+    const time = lineArray[this.IDX_TIMESTAMP];
+    const attr = lineArray[this.IDX_ATTRIBUTE];
+    const size = parseInt(lineArray[this.IDX_SIZE]);
+    const cSize = parseInt(lineArray[this.IDX_COMPRESSED_SIZE]);
+    const name = lineArray[this.IDX_NAME];
+    const builder = new FileModelBuilder();
+    return builder.attribute(attr).timestamp(time).size(size).compressedSize(cSize).name(name).build();
+  }
+
+  private containsPart(parent: FileModel, firstPart: string): FileModel {
+    for (let child of parent.children) {
+      if (child.filename === firstPart) {
+        return child;
+      }
     }
+    return void 0;
+  }
+
+  private createDeepFileModel(parent: FileModel, pathParts: Array<string>, lineArray: Array<string>) {
+    const currentPart = pathParts[0];
+    const remainingParts = pathParts.slice(1, pathParts.length);
+    const child = this.containsPart(parent, currentPart);
+    if (child) {
+      this.createDeepFileModel(child, remainingParts, lineArray);
+    } else {
+      const builder = new FileModelBuilder();
+      if (this.upReferenceMissing(parent)) {
+        parent.children.push(this.createUpReference(parent));
+      }
+      parent.children.push(builder.name(currentPart).build());
+    }
+  }
+
+  private upReferenceMissing(parent: FileModel): boolean {
+    for (let child of parent.children) {
+      if (child.filename === Constants.UP_REFERENCE) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private createUpReference(parent: FileModel): FileModel {
+    const model = new FileModel();
+    model.filename = Constants.UP_REFERENCE;
+    model.parent = parent;
+    return model;
+  }
+
+  private parseLine(line): Array<string> {
+    let s = line;//'2017-09-13 09:58:58 ....A          650          459  package.json'
+    const lines = [];
+    lines.push(s.substr(0, 19));                    // timestamp
+    lines.push(s.substr(20, 5).replace(/\./g, '')); // attribute
+    lines.push(s.substr(26, 12).trim());            // size
+    lines.push(s.substr(39, 12).trim());            // compressed size
+    lines.push(s.substr(53, s.length));             // name
+    return lines;
+  }
 }

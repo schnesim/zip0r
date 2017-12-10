@@ -1,4 +1,5 @@
-import { EntryType } from '../enum'
+import { FileType } from '../enum'
+import { FileModel } from '../file/fileModel';
 
 export class ExtractWrapper {
   public archivePath: string;
@@ -11,14 +12,29 @@ export class ExtractWrapper {
   }
 }
 
-export class ArchiveEntry {
-  public filename: string;
-  public size: number;
-  public compressedSize: number;
-  public type: EntryType;
-  constructor(filename: string, size, compressedSize: number) {
-    this.filename = filename;
-    this.size = size;
-    this.compressedSize = compressedSize;
+export class GridRowValues {
+  private _model: FileModel;
+  constructor(model: FileModel) {
+    this._model = model;
+  }
+
+  public get filename(): string {
+    return this._model.filename;
+  }
+
+  public get compressedSize(): number {
+    return this._model.compressedSize;
+  }
+
+  public get size(): number {
+    return this._model.size;
+  }
+
+  public get type(): FileType {
+    return this._model.fileType;
+  }
+
+  public get model(): FileModel {
+    return this._model;
   }
 }

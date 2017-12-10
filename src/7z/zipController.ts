@@ -102,9 +102,6 @@ export class ZipController {
     index++;
     const summary = lines[index];
     const rootFileModel = this._fileFactory.createFileModel(fileLines);
-    // for (let file of fileLines) {
-    //   files.push(this._fileFactory.createFileModel(file));
-    // }
     return rootFileModel;
   }
 

@@ -1,8 +1,9 @@
 import { ViewElement } from '../viewElement'
 import { ViewEventEmitter } from '../viewEventEmitter';
-import { ArchiveEntry } from '../../helper/wrapper';
+import { GridRowValues } from '../../helper/wrapper';
 import { ZipController } from '../../7z/zipController';
 import { FileModel } from '../../file/fileModel';
+import { Constants } from '../../constants';
 
 export class Grid {
 
@@ -14,6 +15,7 @@ export class Grid {
   private _gridConfig: GridConfig;
   private _columnCount: number;
   private _archivePath: string;
+  private _currentRoot: FileModel;
   private _archiveContent: FileModel;
   private _zipController: ZipController;
 
@@ -45,23 +47,29 @@ export class Grid {
     return result;
   }
 
+  /**
+   * The grid gets populated upen setting of the archive path
+   */
   set archivePath(value: string) {
     this._gridRows = [];
     this._archivePath = value;
     this._archiveContent = this._zipController.openArchive(value);
-    this._archiveContent.children.forEach(entry => {
-      const archiveEntry = new ArchiveEntry(entry.name, entry.size, entry.compressedSize);
-      this._gridRows.push(new GridRow(archiveEntry, this._gridConfig, this._gridRows.length));
-    })
+    this._currentRoot = this._archiveContent;
     this.refresh();
   }
 
   private refresh() {
     this._domNode.innerHTML = '';
+    this._gridRows = [];
     this._domNode.appendChild(this._tableHead);
-    this._gridRows.forEach(row => {
+    this._currentRoot.children.forEach(entry => {
+      const values = new GridRowValues(entry);
+      const row = new GridRow(values, this._gridConfig, this._gridRows.length);
+      row.domNode.addEventListener('click', this.tableRowClick.bind(this, row));
+      row.domNode.addEventListener('dblclick', this.tableRowDblClick.bind(this, row));
       this._domNode.appendChild(row.domNode);
-    });
+      this._gridRows.push(row);
+    })
   }
 
   private sortRowsByFieldNumber(n: number): Array<GridRow> {
@@ -94,20 +102,13 @@ export class Grid {
   }
 
   private tableRowDblClick(gridRow: GridRow, e: MouseEvent) {
-    // todo: Check if charakter for separating folders is the same on windows.
-    if (gridRow.data.filename.includes('/')) {
-
+    const model = gridRow.data.model;
+    if (model.filename === Constants.UP_REFERENCE) {
+      this._currentRoot = model.parent;
+    } else {
+      this._currentRoot = gridRow.data.model;
     }
-  }
-
-  // public addRow(rowData: Array<any>) {
-  public createGridRow(archiveEntry: ArchiveEntry): GridRow {
-    const gridRow = new GridRow(archiveEntry, this._gridConfig, this._gridRows.length);
-    gridRow.domNode.addEventListener('click', this.tableRowClick.bind(this, gridRow));
-    gridRow.domNode.addEventListener('dblclick', this.tableRowDblClick.bind(this, gridRow));
-    // this._domNode.appendChild(gridRow.domNode);
-    // this._gridRows.push(gridRow);
-    return gridRow;
+    this.refresh();
   }
 
   public getDomNode(): HTMLTableElement {
@@ -234,12 +235,12 @@ export class GridConfig {
 export class GridRow extends ViewElement {
 
   // private _data: Array<any>;
-  private _archiveEntry: ArchiveEntry;
+  private _archiveEntry: GridRowValues;
   private _gridConfig: GridConfig;
   private _selected: boolean;
   private _doubleClickCallback: Function;
 
-  constructor(archiveEntry: ArchiveEntry, config: GridConfig, rowCount: number) {
+  constructor(archiveEntry: GridRowValues, config: GridConfig, rowCount: number) {
     super();
     this._archiveEntry = archiveEntry;
     this._gridConfig = config;
@@ -288,7 +289,7 @@ export class GridRow extends ViewElement {
     this._doubleClickCallback = callback;
   }
 
-  get data(): ArchiveEntry {
+  get data(): GridRowValues {
     return this._archiveEntry;
   }
 

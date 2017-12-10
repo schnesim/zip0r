@@ -27,7 +27,7 @@ export class FileElement extends ViewElement {
     super();
     this.domNode = document.createElement('div');
     this._icon = document.createElement('img');
-    if (fileModel.attribute === FileConstants.ATTRIB_FILE) {
+    if (fileModel.fileType === FileConstants.ATTRIB_FILE) {
       this._icon.src = './img/file.svg';
     } else {
       this._icon.src = './img/folder.svg';
@@ -38,7 +38,7 @@ export class FileElement extends ViewElement {
     this._iconDiv.classList.add('file-icon-div');
     this._title = document.createElement('div');
     this._title.classList.add('file-text');
-    this._title.innerText = fileModel.name;
+    this._title.innerText = fileModel.filename;
 
     this.domNode.classList.add('file-element');
     this.domNode.appendChild(this._iconDiv);

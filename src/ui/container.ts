@@ -3,7 +3,7 @@ import { MenuBar } from './menuBar';
 import { Callback, CallbackType } from './event'
 import { FileListContainer } from './fileListContainer';
 import { FileModel } from '../file/fileModel';
-import { ExtractWrapper, ArchiveEntry } from '../helper/wrapper';
+import { ExtractWrapper, GridRowValues } from '../helper/wrapper';
 import { Grid, GridConfig, GridColumn, GridColumnFactory } from './grid/grid';
 import { ZipController } from '../7z/zipController';
 

@@ -3,7 +3,7 @@ export enum Result {
   OVERWRITE
 }
 
-export enum EntryType {
+export enum FileType {
   FILE,
   DIRECTORY
 }
