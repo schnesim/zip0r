@@ -6,7 +6,6 @@ export class MenuBar {
     private _domNode: HTMLDivElement;
     private _btnExtract: MenuButton;
     private _btnAdd: MenuButton;
-    private _btnToggleFlat: MenuButton;
     private _callbacks: Callback[];
     constructor() {
         this._domNode = document.createElement('div');
@@ -27,10 +26,6 @@ export class MenuBar {
         this._btnExtract.domNode.textContent = 'Extract';
         this._btnExtract.registerCallback(this.extractButtonCallback.bind(this));
         this._domNode.appendChild(this._btnExtract.domNode);
-        
-        this._btnToggleFlat = new MenuButton();
-        this._btnToggleFlat.domNode.textContent = 'Toggle flat view';
-        this._domNode.appendChild(this._btnToggleFlat.domNode);
     }
 
     public disableBtnExtract() {

@@ -4,11 +4,12 @@ import { FileType } from '../enum';
 
 export class FileModelFactory {
 
-  private readonly IDX_TIMESTAMP: number = 0;
-  private readonly IDX_ATTRIBUTE: number = 1;
-  private readonly IDX_SIZE: number = 2;
-  private readonly IDX_COMPRESSED_SIZE: number = 3;
-  private readonly IDX_NAME: number = 4;
+  private readonly IDX_DATE: number = 0;
+  private readonly IDX_TIME: number = 1;
+  private readonly IDX_ATTRIBUTE: number = 2;
+  private readonly IDX_SIZE: number = 3;
+  private readonly IDX_COMPRESSED_SIZE: number = 4;
+  private readonly IDX_NAME: number = 5;
   private readonly ATTR_DIRECTORY = 'D';
 
   public createFileModel(lines: string[]): FileModel {
@@ -27,13 +28,14 @@ export class FileModelFactory {
   }
 
   private buildModel(lineArray: Array<string>, parent: FileModel): FileModel {
-    const time = lineArray[this.IDX_TIMESTAMP];
+    const date = lineArray[this.IDX_DATE];
+    const time = lineArray[this.IDX_TIME];
     const attr = lineArray[this.IDX_ATTRIBUTE];
     const size = parseInt(lineArray[this.IDX_SIZE]);
     const cSize = parseInt(lineArray[this.IDX_COMPRESSED_SIZE]);
     const name = lineArray[this.IDX_NAME];
     const builder = new FileModelBuilder();
-    return builder.attribute(this.attr2FileType(attr)).timestamp(time)
+    return builder.attribute(this.attr2FileType(attr)).date(date).time(time)
       .size(size).compressedSize(cSize).name(name).parent(parent).build();
   }
 
@@ -95,7 +97,8 @@ export class FileModelFactory {
   private parseLine(line): Array<string> {
     let s = line;//'2017-09-13 09:58:58 ....A          650          459  package.json'
     const lines = [];
-    lines.push(s.substr(0, 19));                    // timestamp
+    lines.push(s.substr(0, 10));                    // date
+    lines.push(s.substr(12, 19));                   // time
     lines.push(s.substr(20, 5).replace(/\./g, '')); // attribute
     lines.push(s.substr(26, 12).trim());            // size
     lines.push(s.substr(39, 12).trim());            // compressed size

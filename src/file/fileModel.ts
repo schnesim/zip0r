@@ -2,7 +2,8 @@ import { FileType } from "../enum";
 
 export class FileModel {
 
-  private _timestamp: string;
+  private _time: string;
+  private _date: string;
   private _fileType: FileType;
   private _size: number;
   private _compressedSize: number;
@@ -15,12 +16,12 @@ export class FileModel {
     this._children = [];
   }
 
-  public get timestamp(): string {
-    return this._timestamp;
+  public get time(): string {
+    return this._time;
   }
 
-  public set timestamp(value: string) {
-    this._timestamp = value;
+  public set time(value: string) {
+    this._time = value;
   }
 
   public get fileType(): FileType {
@@ -74,6 +75,14 @@ export class FileModel {
   public get children(): Array<FileModel> {
     return this._children;
   }
+
+  public get date(): string {
+    return this._date;
+  }
+  
+  public set date(value: string) {
+    this._date = value;
+  }
 }
 
 export class FileModelBuilder {
@@ -83,8 +92,8 @@ export class FileModelBuilder {
     this._fileModel = new FileModel();
   }
 
-  public timestamp(value: string) {
-    this._fileModel.timestamp = value;
+  public time(value: string) {
+    this._fileModel.time = value;
     return this;
   }
   
@@ -117,7 +126,12 @@ export class FileModelBuilder {
   public parent(value: FileModel) {
     this._fileModel.parent = value;
     return this;
-  }  
+  }
+
+  public date(value: string) {
+    this._fileModel.date = value;
+    return this;
+  }
 
   public build() {
     return this._fileModel;

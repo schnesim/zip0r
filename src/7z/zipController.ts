@@ -92,8 +92,7 @@ export class ZipController {
     const lines = s.split(os.EOL);
     const type = this.extractType(lines);
     const fileLines = [];
-    let index = this.getStartIndexOfArchiveContent(type, os.platform());//os.platform() === 'win32' ? 19 : 17;
-    console.log('startIndex: ' + index);
+    let index = this.getStartIndexOfArchiveContent(type, os.platform());
     for (; index < lines.length; index++) {
       if (lines[index] === '------------------- ----- ------------ ------------  ------------------------') {
         break;

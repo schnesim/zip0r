@@ -45,6 +45,7 @@
 .row-icon-folder {
   background-image: url("./img/folder.svg");
   background-size: 20px;
+  margin-left: 1px;
 }
 
 .header {
