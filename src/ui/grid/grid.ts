@@ -4,6 +4,7 @@ import { GridRowValues } from '../../helper/wrapper';
 import { ZipController } from '../../7z/zipController';
 import { FileModel } from '../../file/fileModel';
 import { Constants } from '../../constants';
+import { FileType } from '../../enum';
 
 export class Grid {
 
@@ -250,7 +251,11 @@ export class GridRow extends ViewElement {
 
     const icon = document.createElement('div');
     icon.classList.add('row-icon');
-    icon.classList.add('row-icon-folder');
+    if (archiveEntry.type === FileType.DIRECTORY) {
+      icon.classList.add('row-icon-folder');
+    } else {
+      icon.classList.add('row-icon-file');
+    }
 
 
     const name = document.createElement('div');

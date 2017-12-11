@@ -2,7 +2,6 @@ import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs';
 import { Container } from './ui/container';
-// import { ZipController } from './7z/zipController';
 
 
 const { remote } = require('electron')
@@ -14,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   const body = document.getElementsByTagName('body')[0];
   body.appendChild(container.getDomNode());
-  // prevent selecting text by double clicking
+  // prevent content selection by double clicking
   body.addEventListener('mousedown', (e) => { e.preventDefault() });
 
   const menu = new Menu()

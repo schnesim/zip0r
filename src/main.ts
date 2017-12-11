@@ -5,6 +5,7 @@ import * as fs from 'fs';
 // import * as ipc from 'ipc';
 const client = process.env.NODE_ENV === 'development' ? require('electron-connect').client : void 0;
 let mainWindow = void 0;
+let cursor: boolean = false;
 
 app.on('ready', function () {
   mainWindow = new BrowserWindow({
@@ -28,6 +29,15 @@ app.on('ready', function () {
 
 const openFileCallback = (files) => {
   mainWindow.webContents.send('archive-path', files);
+  // mainWindow.webContents.executeJavaScript("document.getElementsByTagName('body')[0].style.cursor = 'cell'");
+  // mainWindow.webContents.executeJavaScript("document.getElementsByTagName('body')[0].style.cursor = 'default'");
+  if (cursor) {
+    mainWindow.webContents.executeJavaScript("document.getElementsByTagName('body')[0].style.cursor = 'default'");
+    cursor = false;
+  } else {
+    mainWindow.webContents.executeJavaScript("document.getElementsByTagName('body')[0].style.cursor = 'cell'");
+    cursor = true;
+  }
 }
 
 const menuTemplate: Array<object> = [
