@@ -1,6 +1,6 @@
-import * as path from 'path';
 import { FileModel, FileModelBuilder } from './fileModel';
 import { Constants } from '../constants';
+import { FileType } from '../enum';
 
 export class FileModelFactory {
 
@@ -9,58 +9,75 @@ export class FileModelFactory {
   private readonly IDX_SIZE: number = 2;
   private readonly IDX_COMPRESSED_SIZE: number = 3;
   private readonly IDX_NAME: number = 4;
+  private readonly ATTR_DIRECTORY = 'D';
 
   public createFileModel(lines: string[]): FileModel {
-    let rootFileModel = new FileModel();
+    let root = new FileModel();
     for (let line of lines) {
       const lineArray = this.parseLine(line);
       const name = lineArray[this.IDX_NAME];
-      if (name.indexOf(Constants.PATH_SEPARATOR) > -1) {
-        const pathParts = name.split(Constants.PATH_SEPARATOR);
-        this.createDeepFileModel(rootFileModel, pathParts, lineArray);
+      if (name.indexOf(Constants.PATH_SEPARATOR()) > -1) {
+        const pathParts = name.split(Constants.PATH_SEPARATOR());
+        this.createDeepFileModel(root, pathParts, lineArray);
       } else {
-        rootFileModel.children.push(this.buildModel(lineArray));
+        root.children.push(this.buildModel(lineArray, root));
       }
     }
-    return rootFileModel;
+    return root;
   }
 
-  private buildModel(lineArray: Array<string>): FileModel {
+  private buildModel(lineArray: Array<string>, parent: FileModel): FileModel {
     const time = lineArray[this.IDX_TIMESTAMP];
     const attr = lineArray[this.IDX_ATTRIBUTE];
     const size = parseInt(lineArray[this.IDX_SIZE]);
     const cSize = parseInt(lineArray[this.IDX_COMPRESSED_SIZE]);
     const name = lineArray[this.IDX_NAME];
     const builder = new FileModelBuilder();
-    return builder.attribute(attr).timestamp(time).size(size).compressedSize(cSize).name(name).build();
+    return builder.attribute(this.attr2FileType(attr)).timestamp(time)
+      .size(size).compressedSize(cSize).name(name).parent(parent).build();
   }
 
-  private containsPart(parent: FileModel, firstPart: string): FileModel {
-    for (let child of parent.children) {
-      if (child.filename === firstPart) {
+  private attr2FileType(attr: string) {
+    if (attr === this.ATTR_DIRECTORY) {
+      return FileType.DIRECTORY;
+    }
+    return FileType.FILE;
+  }
+
+  /**
+   * Checks if "currentNode" already contains a childnode of the name "currentPart".
+   */
+  private containsPart(currentNode: FileModel, currentPart: string): FileModel {
+    for (let child of currentNode.children) {
+      if (child.filename === currentPart) {
         return child;
       }
     }
     return void 0;
   }
 
-  private createDeepFileModel(parent: FileModel, pathParts: Array<string>, lineArray: Array<string>) {
+  private createDeepFileModel(currentNode: FileModel, pathParts: Array<string>,
+    lineArray: Array<string>) {
     const currentPart = pathParts[0];
     const remainingParts = pathParts.slice(1, pathParts.length);
-    const child = this.containsPart(parent, currentPart);
+    const child = this.containsPart(currentNode, currentPart);
     if (child) {
       this.createDeepFileModel(child, remainingParts, lineArray);
     } else {
       const builder = new FileModelBuilder();
-      if (this.upReferenceMissing(parent)) {
-        parent.children.push(this.createUpReference(parent));
+      if (this.upReferenceMissing(currentNode)) {
+        currentNode.children.push(this.createUpReference(currentNode));
       }
-      parent.children.push(builder.name(currentPart).build());
+      currentNode.children.push(builder.name(currentPart).parent(currentNode).build());
     }
   }
 
-  private upReferenceMissing(parent: FileModel): boolean {
-    for (let child of parent.children) {
+  /**
+   * Checks if the current node in the file tree already contains
+   * a reference to the parent directory.
+   */
+  private upReferenceMissing(currentNode: FileModel): boolean {
+    for (let child of currentNode.children) {
       if (child.filename === Constants.UP_REFERENCE) {
         return false;
       }

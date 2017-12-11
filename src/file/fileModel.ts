@@ -88,9 +88,9 @@ export class FileModelBuilder {
     return this;
   }
   
-  public attribute(value: string) {
+  public attribute(value: FileType) {
     this._fileModel.fileType = value;
-    this._fileModel.isDirectory = value === 'D';
+    this._fileModel.isDirectory = value === FileType.DIRECTORY;
     return this;
   }
   
@@ -113,6 +113,11 @@ export class FileModelBuilder {
     this._fileModel.children.push(value);
     return this;
   }
+
+  public parent(value: FileModel) {
+    this._fileModel.parent = value;
+    return this;
+  }  
 
   public build() {
     return this._fileModel;

@@ -3,10 +3,11 @@ import * as fs from 'fs';
 import * as os from 'os';
 import { remote } from 'electron';
 
-import { FileModelFactory } from '../file/fileFactory'
+import { FileModelFactory } from '../file/fileModelFactory'
 import { FileModel } from '../file/fileModel'
 import { Result } from '../enum'
 import { ExtractWrapper } from '../helper/wrapper';
+import { Constants } from '../constants';
 
 export class ZipController {
 
@@ -15,10 +16,10 @@ export class ZipController {
 
   constructor() {
     this._fileFactory = new FileModelFactory();
-    if (os.platform() === 'darwin') {
+    if (os.platform() === Constants.PLATFORM_DARWIN) {
       this._7zPath = 'lib/darwin/7z/7z';
     }
-    if (os.platform() === 'win32') {
+    if (os.platform() === Constants.PLATFORM_WIN32) {
       this._7zPath = 'lib/win32/7z/7z.exe';
     }
   }

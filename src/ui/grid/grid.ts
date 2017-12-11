@@ -104,9 +104,9 @@ export class Grid {
   private tableRowDblClick(gridRow: GridRow, e: MouseEvent) {
     const model = gridRow.data.model;
     if (model.filename === Constants.UP_REFERENCE) {
-      this._currentRoot = model.parent;
+      this._currentRoot = model.parent.parent;
     } else {
-      this._currentRoot = gridRow.data.model;
+      this._currentRoot = model;
     }
     this.refresh();
   }

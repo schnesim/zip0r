@@ -66,8 +66,6 @@ export class Container {
   }
 
   public populateGrid(event, archivePath) {
-    // this._archivePath = archivePath;
-    // const archiveContent = this._zipController.openArchive(archivePath);
     if (this._grid) {
       this._domNode.removeChild(this._gridContainer);
     }
@@ -78,9 +76,6 @@ export class Container {
     this._grid = new Grid(this._gridConfig);
     this._grid.archivePath = archivePath;
 
-    // for (let content of archiveContent) {
-    //   this._grid.addRow(new ArchiveEntry(content.name, content.size, content.compressedSize));
-    // }
     this._gridContainer = document.createElement('div');
     this._gridContainer.classList.add('grid-container');
     this._gridContainer.appendChild(this._grid.getDomNode());
