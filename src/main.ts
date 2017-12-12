@@ -31,13 +31,13 @@ const openFileCallback = (files) => {
   mainWindow.webContents.send('archive-path', files);
   // mainWindow.webContents.executeJavaScript("document.getElementsByTagName('body')[0].style.cursor = 'cell'");
   // mainWindow.webContents.executeJavaScript("document.getElementsByTagName('body')[0].style.cursor = 'default'");
-  if (cursor) {
-    mainWindow.webContents.executeJavaScript("document.getElementsByTagName('body')[0].style.cursor = 'default'");
-    cursor = false;
-  } else {
-    mainWindow.webContents.executeJavaScript("document.getElementsByTagName('body')[0].style.cursor = 'cell'");
-    cursor = true;
-  }
+  // if (cursor) {
+  //   mainWindow.webContents.executeJavaScript("document.getElementsByTagName('body')[0].style.cursor = 'default'");
+  //   cursor = false;
+  // } else {
+  //   mainWindow.webContents.executeJavaScript("document.getElementsByTagName('body')[0].style.cursor = 'cell'");
+  //   cursor = true;
+  // }
 }
 
 const menuTemplate: Array<object> = [

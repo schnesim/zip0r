@@ -57,11 +57,7 @@ export class FileModel {
   }
 
   public get isDirectory(): boolean {
-    return this._isDirectory;
-  }
-
-  public set isDirectory(value: boolean) {
-    this._isDirectory = value;
+    return this._fileType === FileType.DIRECTORY;
   }
 
   public get parent(): FileModel {
@@ -99,7 +95,6 @@ export class FileModelBuilder {
   
   public attribute(value: FileType) {
     this._fileModel.fileType = value;
-    this._fileModel.isDirectory = value === FileType.DIRECTORY;
     return this;
   }
   

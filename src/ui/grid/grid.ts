@@ -104,6 +104,9 @@ export class Grid {
 
   private tableRowDblClick(gridRow: GridRow, e: MouseEvent) {
     const model = gridRow.data.model;
+    if (!model.isDirectory) {
+      return;
+    }
     if (model.filename === Constants.UP_REFERENCE) {
       this._currentRoot = model.parent.parent;
     } else {
@@ -121,7 +124,7 @@ export class Grid {
     this._gridRows.forEach(element => {
       if (element.selected) {
         // todo: replace array with properties
-        result.push(element.data[0]);
+        result.push(element.data.filename);
       }
     });
     return result;

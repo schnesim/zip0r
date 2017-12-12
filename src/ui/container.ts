@@ -9,10 +9,9 @@ import { ZipController } from '../7z/zipController';
 export class Container {
   private readonly _domNode: HTMLElement;
   private _menuBar: MenuBar;
-  // private _fileListContainer: FileListContainer;
-  // private _zipController: ZipController;
+  private _zipController: ZipController;
   private _grid: Grid;
-  // We need a container for the grid in order to center it on the site.
+  // We need a container for the grid in order to center it.
   private _gridContainer: HTMLDivElement;
   private _gridConfig: GridConfig;
   private _archivePath: string = '';
@@ -26,8 +25,8 @@ export class Container {
     this._menuBar = new MenuBar();
     this._menuBar.registerCallback(new Callback(CallbackType.EXTRACT, this.btnExtractCallback.bind(this)));
     this._domNode.appendChild(this._menuBar.getDomNode());
-    // this._zipController = new ZipController();
-    ipcRenderer.on('archive-path', this.populateGrid2.bind(this));
+    this._zipController = new ZipController();
+    ipcRenderer.on('archive-path', this.populateGrid.bind(this));
     this.enableDisableButtons();
   }
 
@@ -39,14 +38,19 @@ export class Container {
     }
   }
 
-  private selectDestinationCallback(destDir) {
+  /**
+   * 
+   * @param {Array<String>} destDir
+   */
+  private selectDestinationCallback(destDir: Array<string>) {
     if (destDir === void 0) {
       return;
     }
-    this._lastDestDir = destDir;
+    this._lastDestDir = destDir[0];
     const selectedFiles = this._grid.getSelectedFilenames();
+    console.log(selectedFiles);
     const extractWrapper = new ExtractWrapper(this._archivePath, destDir[0], selectedFiles);
-    // this._zipController.extractFiles(extractWrapper);
+    this._zipController.extractFiles(extractWrapper);
   }
 
   private btnExtractCallback() {
@@ -66,15 +70,7 @@ export class Container {
     }, this.selectDestinationCallback.bind(this));
   }
 
-  public populateGrid2(event, path) {
-    console.log(event + ' ' + path)
-  }
-
   public populateGrid(event, archivePath) {
-    if (!this.first) {
-      return;
-    }
-    this.first = false;
     if (this._grid) {
       this._domNode.removeChild(this._gridContainer);
     }
@@ -84,17 +80,13 @@ export class Container {
     this._gridConfig.addColumn(new GridColumnFactory().setTitle('Compressed Size').setWidth(200).setSortable(false).build());
     this._grid = new Grid(this._gridConfig);
     this._grid.archivePath = archivePath;
+    this._archivePath = archivePath;
 
     this._gridContainer = document.createElement('div');
     this._gridContainer.classList.add('grid-container');
     this._gridContainer.appendChild(this._grid.getDomNode());
     this._domNode.appendChild(this._gridContainer);
     this.enableDisableButtons();
-    this.resetCursor();
-  }
-
-  private resetCursor() {
-    // document.getElementsByTagName('body')[0].style.cursor = 'pointer';
   }
 
   public getDomNode(): HTMLElement {

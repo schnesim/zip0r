@@ -70,7 +70,11 @@ export class FileModelFactory {
       if (this.upReferenceMissing(currentNode)) {
         currentNode.children.push(this.createUpReference(currentNode));
       }
-      currentNode.children.push(builder.name(currentPart).parent(currentNode).build());
+      const child = this.buildModel(lineArray, currentNode);
+      child.filename = currentPart;
+      // In case a folder has no children, we still need an up refernce.
+      child.children.push(this.createUpReference(child));
+      currentNode.children.push(child);
     }
   }
 
@@ -91,6 +95,11 @@ export class FileModelFactory {
     const model = new FileModel();
     model.filename = Constants.UP_REFERENCE;
     model.parent = parent;
+    model.size = 0;
+    model.compressedSize = 0;
+    model.time = '';
+    model.date = '';
+    model.fileType = FileType.DIRECTORY;
     return model;
   }
 
