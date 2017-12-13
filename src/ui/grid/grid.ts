@@ -33,6 +33,20 @@ export class Grid {
     this._domNode = document.createElement('table');
     this._domNode.classList.add('table');
     this._domNode.appendChild(this._tableHead);
+    this._domNode.tabIndex = 0; // https://stackoverflow.com/questions/887551/how-can-i-trigger-an-onkeydown-event-on-html-table-on-firefox
+    this._domNode.addEventListener('keydown', this.gridKeyDownHandler.bind(this));
+    this._domNode.addEventListener('keyup', this.gridKeyUpHandler.bind(this));
+  }
+
+  private gridKeyDownHandler(e: KeyboardEvent) {
+    console.log('*****')
+    if (e.ctrlKey) {
+      // Add this row to the selection
+    }
+  }
+
+  private gridKeyUpHandler(e: KeyboardEvent) {
+    console.log('up')
   }
 
   private createTableHeaderRow(gridConfig: GridConfig): HTMLTableRowElement {
@@ -41,7 +55,9 @@ export class Grid {
     let columnCount = 0;
     for (var index = 0; index < gridConfig.getColumns().length; index++) {
       var column = gridConfig.getColumns()[index];
-      const headerCell = new HeaderCell(index === 0, index === gridConfig.getColumns().length - 1, column, columnCount);
+      const isFirst = index === 0;
+      const isLast = index === gridConfig.getColumns().length - 1;
+      const headerCell = new HeaderCell(isFirst, isLast, column, columnCount);
       result.appendChild(headerCell.domNode);
       columnCount++;
     }
@@ -97,7 +113,7 @@ export class Grid {
   }
 
   private tableRowClick(gridRow: GridRow, e: MouseEvent) {
-    console.log(gridRow);
+    
     this.deselectAll();
     gridRow.selected = true;
   }

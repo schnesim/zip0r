@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', function () {
   body.appendChild(container.getDomNode());
   // prevent content selection by double clicking
   body.addEventListener('mousedown', (e) => { e.preventDefault() });
+  body.addEventListener('keydown', () => {console.log('keydown')})
+  body.addEventListener('keyup', () => {console.log('keyup')})
 
   const menu = new Menu()
   menu.append(new MenuItem({ label: 'MenuItem1', click() { console.log('item 1 clicked') } }))
