@@ -14,3 +14,13 @@ export class Constants {
     }
   }
 }
+
+export class Platform {
+  public static isWin32(): boolean {
+    return os.platform() === Constants.PLATFORM_WIN32;
+  }
+  
+  public static isDarwin(): boolean {
+    return os.platform() === Constants.PLATFORM_DARWIN;
+  }
+}

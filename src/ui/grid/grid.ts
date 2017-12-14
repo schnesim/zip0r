@@ -1,10 +1,9 @@
-import { ViewElement } from '../viewElement'
-import { ViewEventEmitter } from '../viewEventEmitter';
-import { GridRowValues } from '../../helper/wrapper';
 import { ZipController } from '../../7z/zipController';
-import { FileModel } from '../../file/fileModel';
 import { Constants } from '../../constants';
-import { FileType } from '../../enum';
+import { FileModel } from '../../file/fileModel';
+import { GridRowValues } from '../../helper/wrapper';
+import { ViewElement } from '../viewElement';
+import { GridRow } from './gridRow';
 
 export class Grid {
 
@@ -19,6 +18,7 @@ export class Grid {
   private _currentRoot: FileModel;
   private _archiveContent: FileModel;
   private _zipController: ZipController;
+  private _ctrlPressed: boolean = false;
 
   constructor(gridConfig: GridConfig) {
     this._gridConfig = gridConfig;
@@ -39,14 +39,26 @@ export class Grid {
   }
 
   private gridKeyDownHandler(e: KeyboardEvent) {
-    console.log('*****')
-    if (e.ctrlKey) {
-      // Add this row to the selection
+    this._ctrlPressed = e.ctrlKey;
+    if (e.shiftKey) {
+
+    } else {
+      for (let i = 0; i < this._gridRows.length - 1; i++) {
+        const row = this._gridRows[i];
+        if (row.selected && i !== this._gridRows.length - 1) {
+          this._gridRows[i + 1].selected = true;
+          break;
+        }
+      }
     }
   }
 
+  private isNotLastRow(row: GridRow, gridRows: Array<GridRow>): boolean {
+    return gridRows[gridRows.length - 1] !== row;
+  }
+
   private gridKeyUpHandler(e: KeyboardEvent) {
-    console.log('up')
+    this._ctrlPressed = e.ctrlKey;
   }
 
   private createTableHeaderRow(gridConfig: GridConfig): HTMLTableRowElement {
@@ -113,7 +125,7 @@ export class Grid {
   }
 
   private tableRowClick(gridRow: GridRow, e: MouseEvent) {
-    
+    this._domNode.focus();
     this.deselectAll();
     gridRow.selected = true;
   }
@@ -249,85 +261,6 @@ export class GridConfig {
 
   public getColumns(): Array<GridColumn> {
     return this._columns;
-  }
-}
-
-export class GridRow extends ViewElement {
-
-  // private _data: Array<any>;
-  private _archiveEntry: GridRowValues;
-  private _gridConfig: GridConfig;
-  private _selected: boolean;
-  private _doubleClickCallback: Function;
-
-  constructor(archiveEntry: GridRowValues, config: GridConfig, rowCount: number) {
-    super();
-    this._archiveEntry = archiveEntry;
-    this._gridConfig = config;
-    this.domNode = document.createElement('tr');
-    this.domNode.classList.add('row');
-    this.domNode.setAttribute('rowNumber', String(rowCount));
-
-    const icon = document.createElement('div');
-    icon.classList.add('row-icon');
-    if (archiveEntry.type === FileType.DIRECTORY) {
-      icon.classList.add('row-icon-folder');
-    } else {
-      icon.classList.add('row-icon-file');
-    }
-
-
-    const name = document.createElement('div');
-    name.className = 'row-entry-name';
-    name.innerText = this._archiveEntry.filename;
-
-    const iconAndFilename = document.createElement('td');
-    iconAndFilename.addEventListener('dblclick', this.entryDoubleClick.bind(this));
-    iconAndFilename.classList.add('data');
-    // For unknown reasons, setting td:display:flex causes too wide borders. So we have to use a wrapper
-    // to get flex working properly.
-    const wrapperDiv = document.createElement('div');
-    wrapperDiv.classList.add('row-icon-and-filename');
-    wrapperDiv.appendChild(icon)
-    wrapperDiv.appendChild(name)
-    iconAndFilename.appendChild(wrapperDiv);
-
-    this.domNode.appendChild(iconAndFilename);
-    this.domNode.appendChild(this.createTableCell(this._archiveEntry.size, this._gridConfig.getColumns()[1].width));
-    this.domNode.appendChild(this.createTableCell(this._archiveEntry.compressedSize, this._gridConfig.getColumns()[2].width));
-  }
-
-  private entryDoubleClick() {
-
-  }
-
-  private createTableCell(innerText, width: string): HTMLTableDataCellElement {
-    const td = document.createElement('td');
-    td.style.width = width;
-    td.classList.add('data');
-    td.innerText = innerText;
-    return td;
-  }
-
-  public registerCellDoubleClickCallback(callback: Function) {
-    this._doubleClickCallback = callback;
-  }
-
-  get data(): GridRowValues {
-    return this._archiveEntry;
-  }
-
-  get selected() {
-    return this._selected
-  }
-
-  set selected(value: boolean) {
-    this._selected = value;
-    if (value) {
-      this.domNode.classList.add('row-selected');
-    } else {
-      this.domNode.classList.remove('row-selected');
-    }
   }
 }
 

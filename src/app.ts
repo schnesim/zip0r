@@ -2,9 +2,7 @@ import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs';
 import { Container } from './ui/container';
-
-
-const { remote } = require('electron')
+import { remote } from 'electron'
 const { Menu, MenuItem } = remote
 let container;
 
@@ -15,8 +13,6 @@ document.addEventListener('DOMContentLoaded', function () {
   body.appendChild(container.getDomNode());
   // prevent content selection by double clicking
   body.addEventListener('mousedown', (e) => { e.preventDefault() });
-  body.addEventListener('keydown', () => {console.log('keydown')})
-  body.addEventListener('keyup', () => {console.log('keyup')})
 
   const menu = new Menu()
   menu.append(new MenuItem({ label: 'MenuItem1', click() { console.log('item 1 clicked') } }))

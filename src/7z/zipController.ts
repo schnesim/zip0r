@@ -7,7 +7,7 @@ import { FileModelFactory } from '../file/fileModelFactory'
 import { FileModel } from '../file/fileModel'
 import { Result } from '../enum'
 import { ExtractWrapper } from '../helper/wrapper';
-import { Constants } from '../constants';
+import { Constants, Platform } from '../constants';
 
 export class ZipController {
 
@@ -16,10 +16,10 @@ export class ZipController {
 
   constructor() {
     this._fileFactory = new FileModelFactory();
-    if (os.platform() === Constants.PLATFORM_DARWIN) {
+    if (Platform.isDarwin()) {
       this._7zPath = 'lib/darwin/7z/7z';
     }
-    if (os.platform() === Constants.PLATFORM_WIN32) {
+    if (Platform.isWin32()) {
       this._7zPath = 'lib/win32/7z/7z.exe';
     }
   }

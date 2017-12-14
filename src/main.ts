@@ -1,8 +1,6 @@
 import { app, BrowserWindow, dialog, Menu } from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
-// const ipc = require('ipc');
-// import * as ipc from 'ipc';
 const client = process.env.NODE_ENV === 'development' ? require('electron-connect').client : void 0;
 let mainWindow = void 0;
 let cursor: boolean = false;
