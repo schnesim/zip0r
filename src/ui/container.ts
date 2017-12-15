@@ -1,9 +1,11 @@
+import { GridConfig } from './grid/gridConfig';
+import { GridColumnFactory } from './grid/gridColumnFactory';
 import { ipcRenderer, remote } from 'electron';
 import { MenuBar } from './menuBar';
 import { Callback, CallbackType } from './event';
 import { FileModel } from '../file/fileModel';
 import { ExtractWrapper, GridRowValues } from '../helper/wrapper';
-import { Grid, GridConfig, GridColumn, GridColumnFactory } from './grid/grid';
+import { Grid } from './grid/grid';
 import { ZipController } from '../7z/zipController';
 
 export class Container {
@@ -32,7 +34,10 @@ export class Container {
   }
 
   private containerClick(e: MouseEvent) {
-    document.getElementById('grid').focus();
+    const grid = document.getElementById('grid');
+    if (grid !== null) {
+      grid.focus();
+    }
   }
 
   private enableDisableButtons() {
@@ -43,10 +48,6 @@ export class Container {
     }
   }
 
-  /**
-   * 
-   * @param {Array<String>} destDir
-   */
   private selectDestinationCallback(destDir: Array<string>) {
     if (destDir === void 0) {
       return;
@@ -76,7 +77,7 @@ export class Container {
   }
 
   public populateGrid(event, archivePath) {
-    if (this._grid) {
+    if (this._gridContainer) {
       this._domNode.removeChild(this._gridContainer);
     }
     this._gridConfig = new GridConfig();

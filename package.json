@@ -17,7 +17,6 @@
     "electron": "^1.7.9",
     "electron-builder": "^19.49.0",
     "electron-connect": "^0.6.2",
-    "electron-packager": "^8.7.2",
     "gulp": "^3.9.1",
     "gulp-atom-electron": "^1.14.0",
     "gulp-concat": "^2.6.1",

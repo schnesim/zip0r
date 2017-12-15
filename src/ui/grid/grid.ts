@@ -1,3 +1,6 @@
+import { GridConfig } from './gridConfig';
+import { HeaderCell } from './headerCell';
+import { GridColumn } from './gridColumn';
 import { ArrayUtils } from '../../array';
 import { ZipController } from '../../7z/zipController';
 import { Constants } from '../../constants';
@@ -54,11 +57,11 @@ export class Grid {
       this.handleKeyUpEvent(e);
     }
     else if (GetKey(e.keyCode) === KeyCode.Enter
-    && this.getFocusedRow().data.type === FileType.DIRECTORY) {
+      && this.getFocusedRow().data.type === FileType.DIRECTORY) {
       this.openDirectory(this.getFocusedRow());
     }
   }
-  
+
   private handleKeyUpEvent(e: KeyboardEvent) {
     const focusedRow = this.getFocusedRow();
     if (!focusedRow && GetKey(e.keyCode) === KeyCode.UpArrow) {
@@ -87,7 +90,7 @@ export class Grid {
       this._gridRows[index - 1].focused = true;
     }
   }
-  
+
   private handleKeyDownEvent(e: KeyboardEvent) {
     const focusedRow = this.getFocusedRow();
     if (!focusedRow && GetKey(e.keyCode) === KeyCode.DownArrow) {
@@ -229,7 +232,7 @@ export class Grid {
       row.selected = false;
     }
   }
-  
+
   private unfocus() {
     for (let row of this._gridRows) {
       row.focused = false;
@@ -237,20 +240,25 @@ export class Grid {
   }
 
   private tableRowClick(gridRow: GridRow, e: MouseEvent) {
+    const currentIndex = this.getRowIndex(this.getFocusedRow());
+    const newIndex = this.getRowIndex(gridRow);
     // The grid needs to be focused in order to make cursor navigation work
     this._domNode.focus();
     if (!this._ctrlPressed) {
       this.deselectAll();
       this.unfocus();
     }
-    const currentIndex = this.getRowIndex(this.getFocusedRow());
-    const newIndex = this.getRowIndex(gridRow);
     if (this._shiftPressed) {
       if (currentIndex < newIndex) {
         for (let i = currentIndex; i <= newIndex; i++) {
-          const element = this._gridRows[i];
-          
+          this._gridRows[i].selected = true;
         }
+        this._gridRows[newIndex].focused = true;
+      } else if (currentIndex > newIndex) {
+        for (let i = currentIndex; i >= newIndex; i--) {
+          this._gridRows[i].selected = true;
+        }
+        this._gridRows[newIndex].focused = true;
       }
     }
     gridRow.focused = true;
@@ -287,142 +295,4 @@ export class Grid {
     });
     return result;
   }
-}
-
-export class HeaderCell extends ViewElement {
-
-  private _sortIcon: HTMLImageElement;
-  private _colNumber: Number;
-  private _clickCallback: Function;
-  private _mouseoverCallback: Function;
-  private _isFirst: boolean;
-  private _isLast: boolean;
-  private _mouseEnter: boolean;
-
-  constructor(isFirst, isLast, column: GridColumn, colNumber: number) {
-    super();
-    this._isFirst = isFirst;
-    this._isLast = isLast;
-    this.createHeaderCell(column, colNumber)
-  }
-
-  private createHeaderCell(column: GridColumn, colNumber: number) {
-    const header = document.createElement('th');
-    header.className = 'header-cell';
-    header.textContent = column.title;
-    header.style.width = column.width;
-    if (column.sortable) {
-      this._sortIcon = document.createElement('img');
-      this._sortIcon.src = './ui/grid/arrow-down.svg';
-      this._sortIcon.className = 'sort-icon';
-      header.appendChild(this._sortIcon);
-    }
-    header.setAttribute('colNumber', String(colNumber));
-    header.addEventListener('click', this.headerCellClick.bind(this));
-    header.addEventListener('mouseenter', this.headerCellMouseEnter.bind(this));
-    header.addEventListener('mouseleve', this.headerCellMouseLeave.bind(this));
-    header.addEventListener('mousemove', this.headerCellMouseMove.bind(this));
-    this.domNode = header;
-  }
-
-  public registerHeaderCellClickCallback(callback: Function) {
-    this._clickCallback = callback;
-  }
-
-  public registerHeaderCellMouseover(callback: Function) {
-    this._mouseoverCallback = callback;
-  }
-
-  private headerCellMouseEnter(e: MouseEvent) {
-    this._mouseEnter = true;
-  }
-
-  private headerCellMouseLeave(e: MouseEvent) {
-    this._mouseEnter = false;
-    this.domNode.style.cursor = 'default';
-  }
-
-  private headerCellMouseMove(e: MouseEvent) {
-    if (!this._mouseEnter) {
-      return;
-    }
-    const position = this.domNode.getBoundingClientRect();
-    // If the cursor is within the first 10% or last 90% of the cell's width, then show the resize cursor.
-    // If it's the first/last column, then the resize cursor only get's shown on the right/left side.
-    if (this.withinFirstTenPercent(e, position) || this.withinLastTenPercent(e, position)) {
-      this.domNode.style.cursor = 'ew-resize';
-    } else {
-      this.domNode.style.cursor = 'default';
-    }
-  }
-
-  private withinFirstTenPercent(e: MouseEvent, position: ClientRect) {
-    const leftBoundary = position.left;
-    const rightBoundary = position.left + 5;
-    return e.screenX >= leftBoundary && e.screenX <= rightBoundary && !this._isFirst;
-  }
-
-  private withinLastTenPercent(e: MouseEvent, position: ClientRect) {
-    const leftBoundary = position.right - 5;
-    const rightBoundary = position.right;
-    return e.screenX >= leftBoundary && e.screenX <= rightBoundary && !this._isLast;
-  }
-
-  private headerCellClick(e: MouseEvent) {
-    const colNumber = parseInt(e.srcElement.getAttribute('colNumber'));
-    // this._gridRows = this.sortRowsByFieldNumber(colNumber);
-    // this.refresh();
-
-    // this.emit(new TableHeaderCellClickEevent());
-  }
-}
-
-export class GridConfig {
-
-  private _columns: Array<GridColumn>;
-
-  constructor() {
-    this._columns = [];
-  }
-
-  public addColumn(column: GridColumn) {
-    this._columns.push(column);
-  }
-
-  public getColumns(): Array<GridColumn> {
-    return this._columns;
-  }
-}
-
-export class GridColumnFactory {
-  private _gridColumn: GridColumn;
-  constructor() {
-    this._gridColumn = new GridColumn();
-  }
-
-  public setTitle(title: string): GridColumnFactory {
-    this._gridColumn.title = title;
-    return this;
-  }
-
-  public setWidth(width: number): GridColumnFactory {
-    this._gridColumn.width = width + 'px';
-    return this;
-  }
-
-  public setSortable(sortable: boolean): GridColumnFactory {
-    this._gridColumn.sortable = sortable;
-    return this;
-  }
-
-  public build(): GridColumn {
-    return this._gridColumn;
-  }
-}
-
-export class GridColumn {
-  public title: string;
-  public width: string;
-  public sortable: boolean = false;
-  constructor() { }
 }
