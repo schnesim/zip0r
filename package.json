@@ -13,7 +13,7 @@
   },
   "author": "Simon Schneider",
   "license": "ISC",
-    "devDependencies": {
+  "devDependencies": {
     "electron": "^1.7.9",
     "electron-builder": "^19.49.0",
     "electron-connect": "^0.6.2",
@@ -30,5 +30,9 @@
   "build": {
     "appId": "com.example.app",
     "files": "./dist/**/*"
+  },
+  "dependencies": {
+    "@types/underscore": "^1.8.5",
+    "underscore": "^1.8.3"
   }
 }

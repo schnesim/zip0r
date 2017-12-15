@@ -25,9 +25,14 @@ export class Container {
     this._menuBar = new MenuBar();
     this._menuBar.registerCallback(new Callback(CallbackType.EXTRACT, this.btnExtractCallback.bind(this)));
     this._domNode.appendChild(this._menuBar.getDomNode());
+    this._domNode.addEventListener('click', this.containerClick)
     this._zipController = new ZipController();
     ipcRenderer.on('archive-path', this.populateGrid.bind(this));
     this.enableDisableButtons();
+  }
+
+  private containerClick(e: MouseEvent) {
+    document.getElementById('grid').focus();
   }
 
   private enableDisableButtons() {

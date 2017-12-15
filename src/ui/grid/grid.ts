@@ -1,9 +1,13 @@
+import { ArrayUtils } from '../../array';
 import { ZipController } from '../../7z/zipController';
 import { Constants } from '../../constants';
 import { FileModel } from '../../file/fileModel';
 import { GridRowValues } from '../../helper/wrapper';
 import { ViewElement } from '../viewElement';
 import { GridRow } from './gridRow';
+import { GetKey, KeyCode } from '../../keycode'
+import { FileType } from '../../enum';
+import * as _ from 'underscore';
 
 export class Grid {
 
@@ -19,6 +23,7 @@ export class Grid {
   private _archiveContent: FileModel;
   private _zipController: ZipController;
   private _ctrlPressed: boolean = false;
+  private _shiftPressed: boolean = false;
 
   constructor(gridConfig: GridConfig) {
     this._gridConfig = gridConfig;
@@ -31,6 +36,7 @@ export class Grid {
     this._tableHead.appendChild(this._tableHeaderRow);
 
     this._domNode = document.createElement('table');
+    this._domNode.id = 'grid';
     this._domNode.classList.add('table');
     this._domNode.appendChild(this._tableHead);
     this._domNode.tabIndex = 0; // https://stackoverflow.com/questions/887551/how-can-i-trigger-an-onkeydown-event-on-html-table-on-firefox
@@ -40,25 +46,125 @@ export class Grid {
 
   private gridKeyDownHandler(e: KeyboardEvent) {
     this._ctrlPressed = e.ctrlKey;
-    if (e.shiftKey) {
-
-    } else {
-      for (let i = 0; i < this._gridRows.length - 1; i++) {
-        const row = this._gridRows[i];
-        if (row.selected && i !== this._gridRows.length - 1) {
-          this._gridRows[i + 1].selected = true;
-          break;
-        }
+    this._shiftPressed = e.shiftKey;
+    if (GetKey(e.keyCode) === KeyCode.DownArrow) {
+      this.handleKeyDownEvent(e);
+    }
+    else if (GetKey(e.keyCode) === KeyCode.UpArrow) {
+      this.handleKeyUpEvent(e);
+    }
+    else if (GetKey(e.keyCode) === KeyCode.Enter
+    && this.getFocusedRow().data.type === FileType.DIRECTORY) {
+      this.openDirectory(this.getFocusedRow());
+    }
+  }
+  
+  private handleKeyUpEvent(e: KeyboardEvent) {
+    const focusedRow = this.getFocusedRow();
+    if (!focusedRow && GetKey(e.keyCode) === KeyCode.UpArrow) {
+      // No row has focus, so focus the last one
+      if (this._gridRows.length > 0) {
+        this._gridRows[this._gridRows.length - 1].focused = true;
       }
+    } else if (e.shiftKey && this.hasPreviousRow() && !this.previousRowSelected(focusedRow)) {
+      // Select current row and focus previous row
+      const index = this.getRowIndex(focusedRow);
+      this._gridRows[index].selected = true;
+      this._gridRows[index].focused = false;
+      this._gridRows[index - 1].focused = true;
+    } else if (e.shiftKey && this.hasPreviousRow() && this.previousRowSelected(focusedRow)) {
+      // Focus previous row and unselect current row
+      const index = this.getRowIndex(focusedRow);
+      this._gridRows[index].selected = false;
+      this._gridRows[index].focused = false;
+      this._gridRows[index - 1].focused = true;
+    } else if (this.hasPreviousRow()) {
+      // Shift key not pressed, so clear selection and focus previous row
+      this.deselectAll();
+      const index = this.getRowIndex(focusedRow);
+      this._gridRows[index].selected = false;
+      this._gridRows[index].focused = false;
+      this._gridRows[index - 1].focused = true;
+    }
+  }
+  
+  private handleKeyDownEvent(e: KeyboardEvent) {
+    const focusedRow = this.getFocusedRow();
+    if (!focusedRow && GetKey(e.keyCode) === KeyCode.DownArrow) {
+      // No row has focus, so focus the first one
+      if (this._gridRows.length > 0) {
+        this._gridRows[0].focused = true;
+      }
+    } else if (e.shiftKey && this.hasNextRow() && !this.nextRowSelected(focusedRow)) {
+      // Select current row and focus next row
+      const index = this.getRowIndex(focusedRow);
+      this._gridRows[index].selected = true;
+      this._gridRows[index].focused = false;
+      this._gridRows[index + 1].focused = true;
+    } else if (e.shiftKey && this.hasNextRow() && this.nextRowSelected(focusedRow)) {
+      // Focus next row and unselect current row
+      const index = this.getRowIndex(focusedRow);
+      this._gridRows[index].selected = false;
+      this._gridRows[index].focused = false;
+      this._gridRows[index + 1].focused = true;
+    } else if (this.hasNextRow()) {
+      // Shift key not pressed, so clear selection and focus next row
+      this.deselectAll();
+      const index = this.getRowIndex(focusedRow);
+      this._gridRows[index].selected = false;
+      this._gridRows[index].focused = false;
+      this._gridRows[index + 1].focused = true;
     }
   }
 
-  private isNotLastRow(row: GridRow, gridRows: Array<GridRow>): boolean {
-    return gridRows[gridRows.length - 1] !== row;
+  private previousRowSelected(focusedRow: GridRow): boolean {
+    const index = this.getRowIndex(focusedRow);
+    if (index > 0) {
+      return this._gridRows[index - 1].selected;
+    }
+    return false;
+  }
+
+  private nextRowSelected(focusedRow: GridRow): boolean {
+    const index = this.getRowIndex(focusedRow);
+    if (index < this._gridRows.length - 1) {
+      return this._gridRows[index + 1].selected;
+    }
+    return false;
+  }
+
+  private hasNextRow() {
+    return this.getRowIndex(this.getFocusedRow()) < this._gridRows.length - 1;
+  }
+
+  private hasPreviousRow() {
+    return this.getRowIndex(this.getFocusedRow()) > 0;
+  }
+
+  private focusNextRow() {
+    const index = this.getRowIndex(this.getFocusedRow());
   }
 
   private gridKeyUpHandler(e: KeyboardEvent) {
     this._ctrlPressed = e.ctrlKey;
+    this._shiftPressed = e.shiftKey;
+  }
+
+  private getRowIndex(gridRow: GridRow): number {
+    for (let i = 0; i < this._gridRows.length; i++) {
+      if (gridRow === this._gridRows[i]) {
+        return i;
+      }
+    }
+  }
+
+  private getFocusedRow(): GridRow {
+    for (const row of this._gridRows) {
+      if (row.focused) {
+        return row;
+      }
+    }
+    return void 0;
   }
 
   private createTableHeaderRow(gridConfig: GridConfig): HTMLTableRowElement {
@@ -123,14 +229,38 @@ export class Grid {
       row.selected = false;
     }
   }
+  
+  private unfocus() {
+    for (let row of this._gridRows) {
+      row.focused = false;
+    }
+  }
 
   private tableRowClick(gridRow: GridRow, e: MouseEvent) {
+    // The grid needs to be focused in order to make cursor navigation work
     this._domNode.focus();
-    this.deselectAll();
-    gridRow.selected = true;
+    if (!this._ctrlPressed) {
+      this.deselectAll();
+      this.unfocus();
+    }
+    const currentIndex = this.getRowIndex(this.getFocusedRow());
+    const newIndex = this.getRowIndex(gridRow);
+    if (this._shiftPressed) {
+      if (currentIndex < newIndex) {
+        for (let i = currentIndex; i <= newIndex; i++) {
+          const element = this._gridRows[i];
+          
+        }
+      }
+    }
+    gridRow.focused = true;
   }
 
   private tableRowDblClick(gridRow: GridRow, e: MouseEvent) {
+    this.openDirectory(gridRow);
+  }
+
+  private openDirectory(gridRow: GridRow) {
     const model = gridRow.data.model;
     if (!model.isDirectory) {
       return;

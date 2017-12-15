@@ -9,11 +9,16 @@
 }
 
 .row:hover {
-  background-color: lightblue;
+  /* background-color: lightblue; */
+  background-color: rgb(228, 228, 64);
 }
 
 .row-selected {
   background-color: yellow;
+}
+
+.row-focused {
+  background-color: rgb(228, 228, 64);
 }
 
 .row-icon-and-filename {
