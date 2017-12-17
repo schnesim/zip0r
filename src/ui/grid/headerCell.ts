@@ -1,6 +1,8 @@
+import { IEventListener } from '../../event/event';
 import { GridColumn } from './gridColumn';
 import { ViewElement } from '../viewElement';
-export class HeaderCell extends ViewElement {
+import { Callback, CallbackType } from '../event';
+export class HeaderCell extends ViewElement implements IEventListener {
 
   private _sortIcon: HTMLImageElement;
   private _colNumber: Number;
@@ -9,6 +11,9 @@ export class HeaderCell extends ViewElement {
   private _isFirst: boolean;
   private _isLast: boolean;
   private _mouseEnter: boolean;
+  private _mouseDown: boolean;
+  private _gridColum: GridColumn;
+  _callbacks: Callback[];
 
   constructor(isFirst, isLast, column: GridColumn, colNumber: number) {
     super();
@@ -33,7 +38,12 @@ export class HeaderCell extends ViewElement {
     header.addEventListener('mouseenter', this.headerCellMouseEnter.bind(this));
     header.addEventListener('mouseleve', this.headerCellMouseLeave.bind(this));
     header.addEventListener('mousemove', this.headerCellMouseMove.bind(this));
+    header.addEventListener('mouseup', this.headerCellMouseUp.bind(this));
     this.domNode = header;
+  }
+
+  public registerCallback(callback: Callback) {
+    this._callbacks.push(callback);
   }
 
   public registerHeaderCellClickCallback(callback: Function) {
@@ -42,6 +52,18 @@ export class HeaderCell extends ViewElement {
 
   public registerHeaderCellMouseover(callback: Function) {
     this._mouseoverCallback = callback;
+  }
+
+  fireCallback(type: CallbackType) {
+    
+  }
+
+  private headerCellMouseDown(e: MouseEvent) {
+    this._mouseDown = true;
+  }
+
+  private headerCellMouseUp(e: MouseEvent) {
+    this._mouseDown = false;
   }
 
   private headerCellMouseEnter(e: MouseEvent) {

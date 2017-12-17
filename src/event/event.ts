@@ -1,3 +1,5 @@
+import { Callback, CallbackType } from '../ui/event';
 export interface IEventListener {
-  readonly _callbacks: Array<Function>;
+  readonly _callbacks: Callback[];
+  fireCallback(type: CallbackType);
 }

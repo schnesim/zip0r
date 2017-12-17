@@ -179,6 +179,7 @@ export class Grid {
       const isFirst = index === 0;
       const isLast = index === gridConfig.getColumns().length - 1;
       const headerCell = new HeaderCell(isFirst, isLast, column, columnCount);
+      headerCell.registerCallBack(new )
       result.appendChild(headerCell.domNode);
       columnCount++;
     }

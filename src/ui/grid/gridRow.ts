@@ -1,5 +1,5 @@
+import { GridConfig } from './gridConfig';
 import { GridRowValues } from '../../helper/wrapper';
-import { GridConfig } from './grid';
 import { FileType } from '../../enum';
 import { ViewElement } from '../viewElement';
 
