@@ -13,5 +13,6 @@ export class Callback {
 
 export enum CallbackType {
   EXTRACT,
-  ADD
+  ADD,
+  CLICK_HEADER
 }

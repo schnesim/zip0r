@@ -13,12 +13,13 @@ export class HeaderCell extends ViewElement implements IEventListener {
   private _mouseEnter: boolean;
   private _mouseDown: boolean;
   private _gridColum: GridColumn;
-  _callbacks: Callback[];
+  private _callbacks: Callback[];
 
   constructor(isFirst, isLast, column: GridColumn, colNumber: number) {
     super();
     this._isFirst = isFirst;
     this._isLast = isLast;
+    this._callbacks = [];
     this.createHeaderCell(column, colNumber)
   }
 
@@ -44,14 +45,6 @@ export class HeaderCell extends ViewElement implements IEventListener {
 
   public registerCallback(callback: Callback) {
     this._callbacks.push(callback);
-  }
-
-  public registerHeaderCellClickCallback(callback: Function) {
-    this._clickCallback = callback;
-  }
-
-  public registerHeaderCellMouseover(callback: Function) {
-    this._mouseoverCallback = callback;
   }
 
   fireCallback(type: CallbackType) {
@@ -103,6 +96,7 @@ export class HeaderCell extends ViewElement implements IEventListener {
 
   private headerCellClick(e: MouseEvent) {
     const colNumber = parseInt(e.srcElement.getAttribute('colNumber'));
+
     // this._gridRows = this.sortRowsByFieldNumber(colNumber);
     // this.refresh();
 

@@ -11,6 +11,7 @@ import { GridRow } from './gridRow';
 import { GetKey, KeyCode } from '../../keycode'
 import { FileType } from '../../enum';
 import * as _ from 'underscore';
+import { Callback, CallbackType } from '../event';
 
 export class Grid {
 
@@ -144,10 +145,6 @@ export class Grid {
     return this.getRowIndex(this.getFocusedRow()) > 0;
   }
 
-  private focusNextRow() {
-    const index = this.getRowIndex(this.getFocusedRow());
-  }
-
   private gridKeyUpHandler(e: KeyboardEvent) {
     this._ctrlPressed = e.ctrlKey;
     this._shiftPressed = e.shiftKey;
@@ -179,11 +176,15 @@ export class Grid {
       const isFirst = index === 0;
       const isLast = index === gridConfig.getColumns().length - 1;
       const headerCell = new HeaderCell(isFirst, isLast, column, columnCount);
-      headerCell.registerCallBack(new )
+      headerCell.registerCallback(new Callback(CallbackType.CLICK_HEADER, this.headerCellClickCallback.bind(this)));
       result.appendChild(headerCell.domNode);
       columnCount++;
     }
     return result;
+  }
+
+  private headerCellClickCallback() {
+
   }
 
   /**
