@@ -17,7 +17,11 @@ export class ZipController {
   constructor() {
     this._fileFactory = new FileModelFactory();
     if (Platform.isDarwin()) {
-      this._7zPath = 'lib/darwin/7z/7z';
+      if (process.env.NODE_ENV === 'development') {
+        this._7zPath = 'lib/darwin/7z/7z';
+      } else {
+        this._7zPath = process.resourcesPath + '/lib/darwin/7z/7z';
+      }
     }
     if (Platform.isWin32()) {
       this._7zPath = 'lib/win32/7z/7z.exe';
@@ -58,8 +62,8 @@ export class ZipController {
   }
 
   public openArchive(path: string): FileModel {
-    const process = child_process.spawnSync(this._7zPath, ['l', path], { encoding: 'utf8' });
-    const out = process.stdout;
+    const childProcess = child_process.spawnSync(this._7zPath, ['l', path], { encoding: 'utf8' });
+    const out = childProcess.stdout;
     console.log(out)
     const rootFileModel = this.parseContentFlatFile(out);
     return rootFileModel;
@@ -116,6 +120,12 @@ export class ZipController {
     return result;
   }
 
+  /**
+   * This function returns the line index of the archive's content, since the index
+   * is not the same across all archive types 7z can handle.
+   * @param type Archive type (7zip, zip...)
+   * @param platform The OS the application is running on
+   */
   private getStartIndexOfArchiveContent(type: string, platform: string): number {
     switch (platform) {
       case 'win32':

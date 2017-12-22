@@ -23,5 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
     menu.popup(remote.getCurrentWindow())
   }, false)
 
-  container.populateGrid(void 0, "zip0r.7z");
+  if (process.env.NODE_ENV === 'development') {
+    container.populateGrid(void 0, "zip0r.7z");
+  }
 });

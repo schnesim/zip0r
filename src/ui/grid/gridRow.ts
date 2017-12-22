@@ -74,7 +74,7 @@ export class GridRow extends ViewElement {
 
   set selected(value: boolean) {
     this._selected = value;
-    // Only apply the selected css if the row is not focused
+    // Only apply the selected css if the row is not focused, otherwise the focused css might get overwritten
     if (value && !this._focused) {
       this.domNode.classList.add('row-selected');
     } else if (!value) {

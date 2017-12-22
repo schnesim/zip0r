@@ -27,8 +27,18 @@
     "typescript": "^2.6.1"
   },
   "build": {
+    "asar": false,
+    "extraResources": [
+      "lib/darwin/**/*"
+    ],
     "appId": "com.example.app",
-    "files": "./dist/**/*"
+    "files": [
+      "./dist/**/*",
+      "lib/darwin/**/*"
+    ],
+    "mac": {
+      "target": "dir"
+    }
   },
   "dependencies": {
     "@types/underscore": "^1.8.5",
