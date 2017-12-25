@@ -81,9 +81,29 @@ export class Container {
       this._domNode.removeChild(this._gridContainer);
     }
     this._gridConfig = new GridConfig();
-    this._gridConfig.addColumn(new GridColumnFactory().setTitle('Name').setWidth(120).setSortable(true).build());
-    this._gridConfig.addColumn(new GridColumnFactory().setTitle('Size').setWidth(20).setSortable(true).build());
-    this._gridConfig.addColumn(new GridColumnFactory().setTitle('Compressed Size').setWidth(200).setSortable(false).build());
+    this._gridConfig.addColumn(
+      new GridColumnFactory()
+        .setTitle('Name')
+        .setWidth(120)
+        .setSortable(true)
+        .setIsFirst(true)
+        .setFieldName(FileModel.prototype.filename)
+        .build());
+    this._gridConfig.addColumn(
+      new GridColumnFactory()
+        .setTitle('Size')
+        .setWidth(20)
+        .setSortable(true)
+        .setFieldName(String(FileModel.prototype.size))
+        .build());
+    this._gridConfig.addColumn(
+      new GridColumnFactory()
+        .setTitle('Compressed Size')
+        .setWidth(200)
+        .setSortable(false)
+        .setIsLast(true)
+        .setFieldName(String(FileModel.prototype.compressedSize))
+        .build());
     this._grid = new Grid(this._gridConfig);
     this._grid.archivePath = archivePath;
     this._archivePath = archivePath;

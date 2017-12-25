@@ -44,8 +44,8 @@ export class GridRow extends ViewElement {
     iconAndFilename.appendChild(wrapperDiv);
 
     this.domNode.appendChild(iconAndFilename);
-    this.domNode.appendChild(this.createTableCell(this._archiveEntry.size, this._gridConfig.getColumns()[1].width));
-    this.domNode.appendChild(this.createTableCell(this._archiveEntry.compressedSize, this._gridConfig.getColumns()[2].width));
+    this.domNode.appendChild(this.createTableCell(this._archiveEntry.size, this._gridConfig.getColumnsConfig()[1].width));
+    this.domNode.appendChild(this.createTableCell(this._archiveEntry.compressedSize, this._gridConfig.getColumnsConfig()[2].width));
   }
 
   private entryDoubleClick() {

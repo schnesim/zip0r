@@ -1,6 +1,7 @@
+import { HeaderCellClickEvent } from './headerCellClickEvent';
 import { GridConfig } from './gridConfig';
 import { HeaderCell } from './headerCell';
-import { GridColumn } from './gridColumn';
+import { GridColumnConfig } from './gridColumn';
 import { ArrayUtils } from '../../array';
 import { ZipController } from '../../7z/zipController';
 import { Constants } from '../../constants';
@@ -171,11 +172,11 @@ export class Grid {
     const result = document.createElement('tr');
     result.className = 'header';
     let columnCount = 0;
-    for (var index = 0; index < gridConfig.getColumns().length; index++) {
-      var column = gridConfig.getColumns()[index];
+    for (var index = 0; index < gridConfig.getColumnsConfig().length; index++) {
+      var columnConfig = gridConfig.getColumnsConfig()[index];
       const isFirst = index === 0;
-      const isLast = index === gridConfig.getColumns().length - 1;
-      const headerCell = new HeaderCell(isFirst, isLast, column, columnCount);
+      const isLast = index === gridConfig.getColumnsConfig().length - 1;
+      const headerCell = new HeaderCell(columnConfig, columnCount);
       headerCell.registerCallback(new Callback(CallbackType.CLICK_HEADER, this.headerCellClickCallback.bind(this)));
       result.appendChild(headerCell.domNode);
       columnCount++;
@@ -183,8 +184,9 @@ export class Grid {
     return result;
   }
 
-  private headerCellClickCallback() {
-
+  private headerCellClickCallback(event: HeaderCellClickEvent) {
+    this._gridRows = this.sortRowsByFieldNumber(event.colNumber);
+    this.refresh();
   }
 
   /**
@@ -202,8 +204,8 @@ export class Grid {
     this._domNode.innerHTML = '';
     this._gridRows = [];
     this._domNode.appendChild(this._tableHead);
-    this._currentRoot.children.forEach(entry => {
-      const values = new GridRowValues(entry);
+    this._currentRoot.children.forEach(child => {
+      const values = new GridRowValues(child);
       const row = new GridRow(values, this._gridConfig, this._gridRows.length);
       row.domNode.addEventListener('click', this.tableRowClick.bind(this, row));
       row.domNode.addEventListener('dblclick', this.tableRowDblClick.bind(this, row));

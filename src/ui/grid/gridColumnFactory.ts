@@ -1,8 +1,8 @@
-import { GridColumn } from './gridColumn';
+import { GridColumnConfig } from './gridColumn';
 export class GridColumnFactory {
-  private _gridColumn: GridColumn;
+  private _gridColumn: GridColumnConfig;
   constructor() {
-    this._gridColumn = new GridColumn();
+    this._gridColumn = new GridColumnConfig();
   }
 
   public setTitle(title: string): GridColumnFactory {
@@ -20,7 +20,22 @@ export class GridColumnFactory {
     return this;
   }
 
-  public build(): GridColumn {
+  public setIsFirst(value: boolean): GridColumnFactory {
+    this._gridColumn.isFirst = value;
+    return this;
+  }
+
+  public setIsLast(value: boolean): GridColumnFactory {
+    this._gridColumn.isLast = value;
+    return this;
+  }
+
+  public setFieldName(value: string): GridColumnFactory {
+    this._gridColumn.fieldname = value;
+    return this;
+  }
+
+  public build(): GridColumnConfig {
     return this._gridColumn;
   }
 }

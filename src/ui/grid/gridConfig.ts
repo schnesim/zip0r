@@ -1,17 +1,17 @@
-import { GridColumn } from './gridColumn';
+import { GridColumnConfig } from './gridColumn';
 export class GridConfig {
 
-  private _columns: Array<GridColumn>;
+  private _columns: Array<GridColumnConfig>;
 
   constructor() {
     this._columns = [];
   }
 
-  public addColumn(column: GridColumn) {
+  public addColumn(column: GridColumnConfig) {
     this._columns.push(column);
   }
 
-  public getColumns(): Array<GridColumn> {
+  public getColumnsConfig(): Array<GridColumnConfig> {
     return this._columns;
   }
 }

@@ -1,5 +1,6 @@
+import { HeaderCellClickEvent } from './headerCellClickEvent';
 import { IEventListener } from '../../event/event';
-import { GridColumn } from './gridColumn';
+import { GridColumnConfig } from './gridColumn';
 import { ViewElement } from '../viewElement';
 import { Callback, CallbackType } from '../event';
 export class HeaderCell extends ViewElement implements IEventListener {
@@ -12,18 +13,18 @@ export class HeaderCell extends ViewElement implements IEventListener {
   private _isLast: boolean;
   private _mouseEnter: boolean;
   private _mouseDown: boolean;
-  private _gridColum: GridColumn;
+  private _gridColum: GridColumnConfig;
   private _callbacks: Callback[];
 
-  constructor(isFirst, isLast, column: GridColumn, colNumber: number) {
+  constructor(column: GridColumnConfig, colNumber: number) {
     super();
-    this._isFirst = isFirst;
-    this._isLast = isLast;
+    this._isFirst = column.isFirst;
+    this._isLast = column.isLast;
     this._callbacks = [];
     this.createHeaderCell(column, colNumber)
   }
 
-  private createHeaderCell(column: GridColumn, colNumber: number) {
+  private createHeaderCell(column: GridColumnConfig, colNumber: number) {
     const header = document.createElement('th');
     header.className = 'header-cell';
     header.textContent = column.title;
@@ -35,6 +36,7 @@ export class HeaderCell extends ViewElement implements IEventListener {
       header.appendChild(this._sortIcon);
     }
     header.setAttribute('colNumber', String(colNumber));
+    header.setAttribute('fieldName', column.fieldname);
     header.addEventListener('click', this.headerCellClick.bind(this));
     header.addEventListener('mouseenter', this.headerCellMouseEnter.bind(this));
     header.addEventListener('mouseleve', this.headerCellMouseLeave.bind(this));
@@ -96,9 +98,12 @@ export class HeaderCell extends ViewElement implements IEventListener {
 
   private headerCellClick(e: MouseEvent) {
     const colNumber = parseInt(e.srcElement.getAttribute('colNumber'));
-
-    // this._gridRows = this.sortRowsByFieldNumber(colNumber);
-    // this.refresh();
+    this._callbacks.forEach(callback => {
+      if (callback.type === CallbackType.CLICK_HEADER) {
+        callback.callback(new HeaderCellClickEvent(colNumber));
+      }
+    })
+    
 
     // this.emit(new TableHeaderCellClickEevent());
   }
