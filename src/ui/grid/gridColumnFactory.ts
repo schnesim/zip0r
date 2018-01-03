@@ -1,36 +1,36 @@
 import { GridColumnConfig } from './gridColumn';
-export class GridColumnFactory {
+export class GridColumnBuilder {
   private _gridColumn: GridColumnConfig;
   constructor() {
     this._gridColumn = new GridColumnConfig();
   }
 
-  public setTitle(title: string): GridColumnFactory {
+  public setTitle(title: string): GridColumnBuilder {
     this._gridColumn.title = title;
     return this;
   }
 
-  public setWidth(width: number): GridColumnFactory {
+  public setWidth(width: number): GridColumnBuilder {
     this._gridColumn.width = width + 'px';
     return this;
   }
 
-  public setSortable(sortable: boolean): GridColumnFactory {
+  public setSortable(sortable: boolean): GridColumnBuilder {
     this._gridColumn.sortable = sortable;
     return this;
   }
 
-  public setIsFirst(value: boolean): GridColumnFactory {
+  public setIsFirst(value: boolean): GridColumnBuilder {
     this._gridColumn.isFirst = value;
     return this;
   }
 
-  public setIsLast(value: boolean): GridColumnFactory {
+  public setIsLast(value: boolean): GridColumnBuilder {
     this._gridColumn.isLast = value;
     return this;
   }
 
-  public setFieldName(value: string): GridColumnFactory {
+  public setPropertyName(value: string): GridColumnBuilder {
     this._gridColumn.fieldname = value;
     return this;
   }

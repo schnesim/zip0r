@@ -1,14 +1,14 @@
 export class HeaderCellClickEvent {
-  private _colNumber: number;
-  /**
-   * 
-   * @param colNumber The number of the column whose header cell got clicked.
-   */
-  constructor(colNumber: number) {
-    this._colNumber = colNumber;
+  private _fieldname: string;
+  private _reverseOrder: boolean;
+  constructor(fieldname: string, reverseOrder: boolean) {
+    this._fieldname = fieldname;
+    this._reverseOrder = reverseOrder;
   }
-
-  public get colNumber(): number {
-    return this._colNumber;
+  public get fieldname(): string {
+    return this._fieldname;
+  }
+  public get reverseOrder(): boolean {
+    return this._reverseOrder;
   }
 }

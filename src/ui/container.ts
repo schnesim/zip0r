@@ -1,5 +1,6 @@
+import { ObjectHelper } from '../helper/objectHelper';
 import { GridConfig } from './grid/gridConfig';
-import { GridColumnFactory } from './grid/gridColumnFactory';
+import { GridColumnBuilder } from './grid/gridColumnFactory';
 import { ipcRenderer, remote } from 'electron';
 import { MenuBar } from './menuBar';
 import { Callback, CallbackType } from './event';
@@ -7,6 +8,7 @@ import { FileModel } from '../file/fileModel';
 import { ExtractWrapper, GridRowValues } from '../helper/wrapper';
 import { Grid } from './grid/grid';
 import { ZipController } from '../7z/zipController';
+import { prototype } from 'events';
 
 export class Container {
   private readonly _domNode: HTMLElement;
@@ -82,27 +84,27 @@ export class Container {
     }
     this._gridConfig = new GridConfig();
     this._gridConfig.addColumn(
-      new GridColumnFactory()
+      new GridColumnBuilder()
         .setTitle('Name')
         .setWidth(120)
         .setSortable(true)
         .setIsFirst(true)
-        .setFieldName(FileModel.prototype.filename)
+        .setPropertyName('filename')
         .build());
     this._gridConfig.addColumn(
-      new GridColumnFactory()
+      new GridColumnBuilder()
         .setTitle('Size')
         .setWidth(20)
         .setSortable(true)
-        .setFieldName(String(FileModel.prototype.size))
+        .setPropertyName('size')
         .build());
     this._gridConfig.addColumn(
-      new GridColumnFactory()
+      new GridColumnBuilder()
         .setTitle('Compressed Size')
         .setWidth(200)
         .setSortable(false)
         .setIsLast(true)
-        .setFieldName(String(FileModel.prototype.compressedSize))
+        .setPropertyName('compressedSize')
         .build());
     this._grid = new Grid(this._gridConfig);
     this._grid.archivePath = archivePath;

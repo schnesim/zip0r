@@ -13,6 +13,7 @@ import { GetKey, KeyCode } from '../../keycode'
 import { FileType } from '../../enum';
 import * as _ from 'underscore';
 import { Callback, CallbackType } from '../event';
+import { reverse } from 'dns';
 
 export class Grid {
 
@@ -185,8 +186,15 @@ export class Grid {
   }
 
   private headerCellClickCallback(event: HeaderCellClickEvent) {
-    this._gridRows = this.sortRowsByFieldNumber(event.colNumber);
+    this.resetSortIcon();
+    this._gridRows = this.sortRowsByFieldNumber(event.fieldname, event.reverseOrder);
     this.refresh();
+  }
+
+  private resetSortIcon() {
+    this._gridHeaderRow.forEach(row => {
+      row.resetSortIcon();
+    })
   }
 
   /**
@@ -197,27 +205,31 @@ export class Grid {
     this._archivePath = value;
     this._archiveContent = this._zipController.openArchive(value);
     this._currentRoot = this._archiveContent;
+    this._currentRoot.children.forEach(child => {
+      const values = new GridRowValues(child);
+      const row = new GridRow(values, this._gridConfig, this._gridRows.length);
+      this._gridRows.push(row);
+    })
     this.refresh();
   }
 
   private refresh() {
     this._domNode.innerHTML = '';
-    this._gridRows = [];
+    // this._gridRows = [];
     this._domNode.appendChild(this._tableHead);
-    this._currentRoot.children.forEach(child => {
-      const values = new GridRowValues(child);
-      const row = new GridRow(values, this._gridConfig, this._gridRows.length);
+    this._gridRows.forEach(row => {
       row.domNode.addEventListener('click', this.tableRowClick.bind(this, row));
       row.domNode.addEventListener('dblclick', this.tableRowDblClick.bind(this, row));
       this._domNode.appendChild(row.domNode);
-      this._gridRows.push(row);
     })
   }
 
-  private sortRowsByFieldNumber(n: number): Array<GridRow> {
-    return this._gridRows.sort((firstArg, secondArg) => {
-      const a = firstArg.data[n];
-      const b = secondArg.data[n];
+  private sortRowsByFieldNumber(fieldname: string, reverseOrder: boolean): Array<GridRow> {
+    // todo: remove all folders from the gridrows, add them to a second array, sort the two arrays, then combine them,
+    // so that folders stay at the top
+    let gridRows = this._gridRows.sort((firstArg, secondArg) => {
+      const a = firstArg.data[fieldname];
+      const b = secondArg.data[fieldname];
       if (typeof a === 'number' && typeof b === 'number') {
         return a - b;
       }
@@ -229,6 +241,10 @@ export class Grid {
         }
       }
     });
+    if (reverseOrder) {
+      gridRows = gridRows.reverse();
+    }
+    return gridRows;
   }
 
   private deselectAll() {

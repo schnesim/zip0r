@@ -15,6 +15,7 @@ export class HeaderCell extends ViewElement implements IEventListener {
   private _mouseDown: boolean;
   private _gridColum: GridColumnConfig;
   private _callbacks: Callback[];
+  private _reverseOrder: boolean = false;
 
   constructor(column: GridColumnConfig, colNumber: number) {
     super();
@@ -33,11 +34,14 @@ export class HeaderCell extends ViewElement implements IEventListener {
       this._sortIcon = document.createElement('img');
       this._sortIcon.src = './ui/grid/arrow-down.svg';
       this._sortIcon.className = 'sort-icon';
+      this._sortIcon.style.visibility = 'hidden';
       header.appendChild(this._sortIcon);
     }
     header.setAttribute('colNumber', String(colNumber));
-    header.setAttribute('fieldName', column.fieldname);
-    header.addEventListener('click', this.headerCellClick.bind(this));
+    header.setAttribute('fieldname', column.fieldname);
+    if (column.sortable) {
+      header.addEventListener('click', this.headerCellClick.bind(this));
+    }
     header.addEventListener('mouseenter', this.headerCellMouseEnter.bind(this));
     header.addEventListener('mouseleve', this.headerCellMouseLeave.bind(this));
     header.addEventListener('mousemove', this.headerCellMouseMove.bind(this));
@@ -47,6 +51,10 @@ export class HeaderCell extends ViewElement implements IEventListener {
 
   public registerCallback(callback: Callback) {
     this._callbacks.push(callback);
+  }
+
+  public resetSortIcon() {
+    this._sortIcon.style.visibility = 'hidden';
   }
 
   fireCallback(type: CallbackType) {
@@ -97,14 +105,19 @@ export class HeaderCell extends ViewElement implements IEventListener {
   }
 
   private headerCellClick(e: MouseEvent) {
-    const colNumber = parseInt(e.srcElement.getAttribute('colNumber'));
+    this._sortIcon.style.visibility = 'visisble';
+    if (this._reverseOrder) {
+      this._reverseOrder = !this._reverseOrder;
+      this._sortIcon.src = './ui/grid/arrow-down.svg';
+    } else {
+      this._reverseOrder = !this._reverseOrder;
+      this._sortIcon.src = './ui/grid/arrow-up.svg';
+    }
+    const fieldname = e.srcElement.getAttribute('fieldname');
     this._callbacks.forEach(callback => {
       if (callback.type === CallbackType.CLICK_HEADER) {
-        callback.callback(new HeaderCellClickEvent(colNumber));
+        callback.callback(new HeaderCellClickEvent(fieldname, this._reverseOrder));
       }
-    })
-    
-
-    // this.emit(new TableHeaderCellClickEevent());
+    });
   }
 }
