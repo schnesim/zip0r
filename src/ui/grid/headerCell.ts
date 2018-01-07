@@ -82,25 +82,23 @@ export class HeaderCell extends ViewElement implements IEventListener {
     if (!this._mouseEnter) {
       return;
     }
-    const position = this.domNode.getBoundingClientRect();
-    // If the cursor is within the first 10% or last 90% of the cell's width, then show the resize cursor.
-    // If it's the first/last column, then the resize cursor only get's shown on the right/left side.
-    if (this.withinFirstTenPercent(e, position) || this.withinLastTenPercent(e, position)) {
+    const cellBoundingRect = this.domNode.getBoundingClientRect();
+    if (this.withinLeftMargin(e, cellBoundingRect) || this.withinRightMargin(e, cellBoundingRect)) {
       this.domNode.style.cursor = 'ew-resize';
     } else {
       this.domNode.style.cursor = 'default';
     }
   }
 
-  private withinFirstTenPercent(e: MouseEvent, position: ClientRect) {
-    const leftBoundary = position.left;
-    const rightBoundary = position.left + 5;
+  private withinLeftMargin(e: MouseEvent, cellBoundingRect: ClientRect) {
+    const leftBoundary = cellBoundingRect.left;
+    const rightBoundary = cellBoundingRect.left + 5;
     return e.screenX >= leftBoundary && e.screenX <= rightBoundary && !this._isFirst;
   }
 
-  private withinLastTenPercent(e: MouseEvent, position: ClientRect) {
-    const leftBoundary = position.right - 5;
-    const rightBoundary = position.right;
+  private withinRightMargin(e: MouseEvent, cellBoundingRect: ClientRect) {
+    const leftBoundary = cellBoundingRect.right - 5;
+    const rightBoundary = cellBoundingRect.right;
     return e.screenX >= leftBoundary && e.screenX <= rightBoundary && !this._isLast;
   }
 

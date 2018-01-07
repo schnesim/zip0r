@@ -1,14 +1,14 @@
-import { ObjectHelper } from '../helper/objectHelper';
-import { GridConfig } from './grid/gridConfig';
-import { GridColumnBuilder } from './grid/gridColumnFactory';
+import { MenuButtonBuilder } from './menuBar/menuButtonBuilder';
+import { MenuBar } from './menuBar/menuBar';
 import { ipcRenderer, remote } from 'electron';
-import { MenuBar } from './menuBar';
-import { Callback, CallbackType } from './event';
-import { FileModel } from '../file/fileModel';
-import { ExtractWrapper, GridRowValues } from '../helper/wrapper';
-import { Grid } from './grid/grid';
+
 import { ZipController } from '../7z/zipController';
-import { prototype } from 'events';
+import { ExtractWrapper } from '../helper/wrapper';
+import { Callback, CallbackType } from './event';
+import { Grid } from './grid/grid';
+import { GridColumnBuilder } from './grid/gridColumnFactory';
+import { GridConfig } from './grid/gridConfig';
+import { MenuButton } from './menuBar/menuButton';
 
 export class Container {
   private readonly _domNode: HTMLElement;
@@ -20,6 +20,8 @@ export class Container {
   private _gridConfig: GridConfig;
   private _archivePath: string = '';
   private _lastDestDir: string = '';
+  private _btnAdd: MenuButton;
+  private _btnExtract: MenuButton;
 
   private first: boolean = true;
 
@@ -27,12 +29,20 @@ export class Container {
     this._domNode = document.createElement('div');
     this._domNode.className = 'container'
     this._menuBar = new MenuBar();
-    this._menuBar.registerCallback(new Callback(CallbackType.EXTRACT, this.btnExtractCallback.bind(this)));
+    this._btnAdd = new MenuButtonBuilder().title('Add').build();
+    this._btnExtract = new MenuButtonBuilder().title('Extract').callback(this.btnExtractCallback.bind(this)).build();
+    this._menuBar.getDomNode().appendChild(this._btnAdd.domNode);
+    this._menuBar.getDomNode().appendChild(this._btnExtract.domNode);
+    // todo: this is stupid, registering the callback with the MenuBar. The callback should be registered with the actual button.
+    /**
+     * this._menuBar.addButton('Add', this.btnAddCallback);
+     */
+    // this._menuBar.registerCallback(new Callback(CallbackType.EXTRACT, this.btnExtractCallback.bind(this)));
     this._domNode.appendChild(this._menuBar.getDomNode());
     this._domNode.addEventListener('click', this.containerClick)
     this._zipController = new ZipController();
     ipcRenderer.on('archive-path', this.populateGrid.bind(this));
-    this.enableDisableButtons();
+    // this.enableDisableButtons();
   }
 
   private containerClick(e: MouseEvent) {
