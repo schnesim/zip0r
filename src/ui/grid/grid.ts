@@ -1,19 +1,15 @@
-import { HeaderCellClickEvent } from './headerCellClickEvent';
-import { GridConfig } from './gridConfig';
-import { HeaderCell } from './headerCell';
-import { GridColumnConfig } from './gridColumn';
-import { ArrayUtils } from '../../array';
 import { ZipController } from '../../7z/zipController';
 import { Constants } from '../../constants';
+import { Callback } from '../../domain/callback';
+import { CallbackType } from '../../domain/callbackType';
+import { FileType } from '../../enum';
 import { FileModel } from '../../file/fileModel';
 import { GridRowValues } from '../../helper/wrapper';
-import { ViewElement } from '../viewElement';
+import { GetKey, KeyCode } from '../../keycode';
+import { GridConfig } from './gridConfig';
 import { GridRow } from './gridRow';
-import { GetKey, KeyCode } from '../../keycode'
-import { FileType } from '../../enum';
-import * as _ from 'underscore';
-import { Callback, CallbackType } from '../event';
-import { reverse } from 'dns';
+import { HeaderCell } from './headerCell';
+import { HeaderCellClickEvent } from './headerCellClickEvent';
 
 export class Grid {
 
@@ -178,11 +174,16 @@ export class Grid {
       const isFirst = index === 0;
       const isLast = index === gridConfig.getColumnsConfig().length - 1;
       const headerCell = new HeaderCell(columnConfig, columnCount);
-      headerCell.registerCallback(new Callback(CallbackType.CLICK_HEADER, this.headerCellClickCallback.bind(this)));
+      headerCell.registerCallback(new Callback(CallbackType.HEADER_CLICK, this.headerCellClickCallback.bind(this)));
+      headerCell.registerCallback(new Callback(CallbackType.HEADER_RESIZE, this.headerCellResizeCallback.bind(this)));
       result.appendChild(headerCell.domNode);
       columnCount++;
     }
     return result;
+  }
+
+  private headerCellResizeCallback() {
+    
   }
 
   private headerCellClickCallback(event: HeaderCellClickEvent) {

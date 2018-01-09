@@ -36,16 +36,6 @@ export class MenuBar {
   //   this._domNode.appendChild(this._btnExtract.domNode);
   // }
 
-  // public disableBtnExtract() {
-  //   this._btnExtract.domNode.classList.remove('menu-button-active');
-  //   this._btnExtract.domNode.classList.add('menu-button-disabled');
-  // }
-
-  // public enableBtnExtract() {
-  //   this._btnExtract.domNode.classList.add('menu-button-active');
-  //   this._btnExtract.domNode.classList.remove('menu-button-disabled');
-  // }
-
   public getDomNode(): HTMLElement {
     return this._domNode;
   }

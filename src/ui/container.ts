@@ -42,7 +42,7 @@ export class Container {
     this._domNode.addEventListener('click', this.containerClick)
     this._zipController = new ZipController();
     ipcRenderer.on('archive-path', this.populateGrid.bind(this));
-    // this.enableDisableButtons();
+    this.enableDisableButtons();
   }
 
   private containerClick(e: MouseEvent) {
@@ -54,9 +54,11 @@ export class Container {
 
   private enableDisableButtons() {
     if (this._archivePath === '') {
-      this._menuBar.disableBtnExtract();
+      this._btnExtract.domNode.classList.remove('menu-button-active');
+      this._btnExtract.domNode.classList.add('menu-button-disabled');
     } else {
-      this._menuBar.enableBtnExtract();
+      this._btnExtract.domNode.classList.add('menu-button-active');
+      this._btnExtract.domNode.classList.remove('menu-button-disabled');
     }
   }
 

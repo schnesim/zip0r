@@ -1,8 +1,11 @@
-import { HeaderCellClickEvent } from './headerCellClickEvent';
+import { Callback } from '../../domain/callback';
+import { CallbackType } from '../../domain/callbackType';
 import { IEventListener } from '../../event/event';
-import { GridColumnConfig } from './gridColumn';
+import { IEvent } from '../event';
 import { ViewElement } from '../viewElement';
-import { Callback, CallbackType } from '../event';
+import { GridColumnConfig } from './gridColumn';
+import { HeaderCellClickEvent } from './headerCellClickEvent';
+
 export class HeaderCell extends ViewElement implements IEventListener {
 
   private _sortIcon: HTMLImageElement;
@@ -45,6 +48,7 @@ export class HeaderCell extends ViewElement implements IEventListener {
     header.addEventListener('mouseenter', this.headerCellMouseEnter.bind(this));
     header.addEventListener('mouseleve', this.headerCellMouseLeave.bind(this));
     header.addEventListener('mousemove', this.headerCellMouseMove.bind(this));
+    header.addEventListener('mousedown', this.headerCellMouseDown.bind(this));
     header.addEventListener('mouseup', this.headerCellMouseUp.bind(this));
     this.domNode = header;
   }
@@ -57,8 +61,14 @@ export class HeaderCell extends ViewElement implements IEventListener {
     this._sortIcon.style.visibility = 'hidden';
   }
 
-  fireCallback(type: CallbackType) {
-    
+  fireCallback(event: IEvent) {
+    if (event.callbackType === CallbackType.HEADER_CLICK) {
+      this._callbacks.forEach(callback => {
+        if (callback.type === CallbackType.HEADER_CLICK) {
+          callback.callback(event);
+        }
+      });
+    }
   }
 
   private headerCellMouseDown(e: MouseEvent) {
@@ -79,13 +89,25 @@ export class HeaderCell extends ViewElement implements IEventListener {
   }
 
   private headerCellMouseMove(e: MouseEvent) {
-    if (!this._mouseEnter) {
+    if (!this._mouseEnter && !this._mouseDown) {
       return;
     }
+    this.updateCursor(e);
+    if (this._mouseDown) {
+      this.resize();
+    }
+  }
+
+  private resize() {
+    // this.fireCallback(new HeaderCellResizeEvent());
+  }
+
+  private updateCursor(e: MouseEvent) {
     const cellBoundingRect = this.domNode.getBoundingClientRect();
     if (this.withinLeftMargin(e, cellBoundingRect) || this.withinRightMargin(e, cellBoundingRect)) {
       this.domNode.style.cursor = 'ew-resize';
-    } else {
+    }
+    else {
       this.domNode.style.cursor = 'default';
     }
   }
@@ -105,17 +127,12 @@ export class HeaderCell extends ViewElement implements IEventListener {
   private headerCellClick(e: MouseEvent) {
     this._sortIcon.style.visibility = 'visisble';
     if (this._reverseOrder) {
-      this._reverseOrder = !this._reverseOrder;
       this._sortIcon.src = './ui/grid/arrow-down.svg';
     } else {
-      this._reverseOrder = !this._reverseOrder;
       this._sortIcon.src = './ui/grid/arrow-up.svg';
     }
+    this._reverseOrder = !this._reverseOrder;
     const fieldname = e.srcElement.getAttribute('fieldname');
-    this._callbacks.forEach(callback => {
-      if (callback.type === CallbackType.CLICK_HEADER) {
-        callback.callback(new HeaderCellClickEvent(fieldname, this._reverseOrder));
-      }
-    });
+    this.fireCallback(new HeaderCellClickEvent(fieldname, this._reverseOrder, CallbackType.HEADER_CLICK));
   }
 }
