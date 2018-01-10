@@ -1,3 +1,4 @@
+import { HeaderCellResizeEvent } from './headerCellResizeEvent';
 import { Callback } from '../../domain/callback';
 import { CallbackType } from '../../domain/callbackType';
 import { IEventListener } from '../../event/event';
@@ -68,6 +69,12 @@ export class HeaderCell extends ViewElement implements IEventListener {
           callback.callback(event);
         }
       });
+    } else if (event.callbackType === CallbackType.HEADER_RESIZE) {
+      this._callbacks.forEach(callback => {
+        if (callback.type === CallbackType.HEADER_RESIZE) {
+          callback.callback(event);
+        }
+      });
     }
   }
 
@@ -94,12 +101,13 @@ export class HeaderCell extends ViewElement implements IEventListener {
     }
     this.updateCursor(e);
     if (this._mouseDown) {
-      this.resize();
+      this.headerCellResize(e);
     }
   }
 
-  private resize() {
-    // this.fireCallback(new HeaderCellResizeEvent());
+  private headerCellResize(e: MouseEvent) {
+    const fieldname = e.srcElement.getAttribute('fieldname');
+    this.fireCallback(new HeaderCellResizeEvent(fieldname));
   }
 
   private updateCursor(e: MouseEvent) {
@@ -133,6 +141,6 @@ export class HeaderCell extends ViewElement implements IEventListener {
     }
     this._reverseOrder = !this._reverseOrder;
     const fieldname = e.srcElement.getAttribute('fieldname');
-    this.fireCallback(new HeaderCellClickEvent(fieldname, this._reverseOrder, CallbackType.HEADER_CLICK));
+    this.fireCallback(new HeaderCellClickEvent(fieldname, this._reverseOrder));
   }
 }

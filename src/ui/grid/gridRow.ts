@@ -17,7 +17,7 @@ export class GridRow extends ViewElement {
     this._gridConfig = config;
     this.domNode = document.createElement('tr');
     this.domNode.classList.add('row');
-    this.domNode.setAttribute('rowNumber', String(rowCount));
+    // this.domNode.setAttribute('rowNumber', String(rowCount));
 
     const icon = document.createElement('div');
     icon.classList.add('row-icon');
@@ -27,18 +27,18 @@ export class GridRow extends ViewElement {
       icon.classList.add('row-icon-file');
     }
 
-
     const name = document.createElement('div');
     name.className = 'row-entry-name';
     name.innerText = this._archiveEntry.filename;
 
     const iconAndFilename = document.createElement('td');
     iconAndFilename.addEventListener('dblclick', this.entryDoubleClick.bind(this));
-    iconAndFilename.classList.add('data');
-    // For unknown reasons, setting td:display:flex causes too wide borders. So we have to use a wrapper
+    iconAndFilename.classList.add('grid-cell');
+    // For some reason, setting td:display:flex causes too wide borders. So we have to use a wrapper
     // to get flex working properly.
     const wrapperDiv = document.createElement('div');
     wrapperDiv.classList.add('row-icon-and-filename');
+    // wrapperDiv.style.width = '120px';//this._gridConfig.getColumnsConfig()[0].width;
     wrapperDiv.appendChild(icon)
     wrapperDiv.appendChild(name)
     iconAndFilename.appendChild(wrapperDiv);
@@ -55,7 +55,7 @@ export class GridRow extends ViewElement {
   private createTableCell(innerText, width: string): HTMLTableDataCellElement {
     const td = document.createElement('td');
     td.style.width = width;
-    td.classList.add('data');
+    td.classList.add('grid-cell');
     td.innerText = innerText;
     return td;
   }

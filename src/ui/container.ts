@@ -4,7 +4,6 @@ import { ipcRenderer, remote } from 'electron';
 
 import { ZipController } from '../7z/zipController';
 import { ExtractWrapper } from '../helper/wrapper';
-import { Callback, CallbackType } from './event';
 import { Grid } from './grid/grid';
 import { GridColumnBuilder } from './grid/gridColumnFactory';
 import { GridConfig } from './grid/gridConfig';

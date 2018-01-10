@@ -183,19 +183,30 @@ export class Grid {
   }
 
   private headerCellResizeCallback() {
-    
+    this._gridConfig.getColumnsConfig()[0].width = "200";
+    this.refreshGridRows();
+    this.refreshHtml();
   }
 
   private headerCellClickCallback(event: HeaderCellClickEvent) {
     this.resetSortIcon();
     this._gridRows = this.sortRowsByFieldNumber(event.fieldname, event.reverseOrder);
-    this.refresh();
+    this.refreshHtml();
   }
 
   private resetSortIcon() {
     this._gridHeaderRow.forEach(row => {
       row.resetSortIcon();
     })
+  }
+
+  private refreshGridRows() {
+    this._gridRows = [];
+    this._currentRoot.children.forEach(child => {
+      const values = new GridRowValues(child);
+      const row = new GridRow(values, this._gridConfig, this._gridRows.length);
+      this._gridRows.push(row);
+    });
   }
 
   /**
@@ -206,15 +217,11 @@ export class Grid {
     this._archivePath = value;
     this._archiveContent = this._zipController.openArchive(value);
     this._currentRoot = this._archiveContent;
-    this._currentRoot.children.forEach(child => {
-      const values = new GridRowValues(child);
-      const row = new GridRow(values, this._gridConfig, this._gridRows.length);
-      this._gridRows.push(row);
-    })
-    this.refresh();
+    this.refreshGridRows()
+    this.refreshHtml();
   }
 
-  private refresh() {
+  private refreshHtml() {
     this._domNode.innerHTML = '';
     // this._gridRows = [];
     this._domNode.appendChild(this._tableHead);
@@ -299,7 +306,7 @@ export class Grid {
     } else {
       this._currentRoot = model;
     }
-    this.refresh();
+    this.refreshHtml();
   }
 
   public getDomNode(): HTMLTableElement {

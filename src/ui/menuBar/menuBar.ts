@@ -1,5 +1,6 @@
+import { Callback } from '../../domain/callback';
+import { CallbackType } from '../../domain/callbackType';
 import { MenuButton } from './menuButton';
-import { Callback, CallbackType } from '../event';
 
 export class MenuBar {
   private _domNode: HTMLDivElement;
