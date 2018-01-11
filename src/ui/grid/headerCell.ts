@@ -1,11 +1,12 @@
-import { HeaderCellResizeEvent } from './headerCellResizeEvent';
 import { Callback } from '../../domain/callback';
 import { CallbackType } from '../../domain/callbackType';
-import { IEventListener } from '../../event/event';
+import { MousePosition } from '../../domain/mousePosition';
+import { IEventListener } from '../../event/eventListener';
 import { IEvent } from '../event';
 import { ViewElement } from '../viewElement';
 import { GridColumnConfig } from './gridColumn';
 import { HeaderCellClickEvent } from './headerCellClickEvent';
+import { HeaderCellResizeEvent } from './headerCellResizeEvent';
 
 export class HeaderCell extends ViewElement implements IEventListener {
 
@@ -17,6 +18,8 @@ export class HeaderCell extends ViewElement implements IEventListener {
   private _isLast: boolean;
   private _mouseEnter: boolean;
   private _mouseDown: boolean;
+  private _mouseDownInitalPos: MousePosition;
+  private _mouseDownNewPos: MousePosition;
   private _gridColum: GridColumnConfig;
   private _callbacks: Callback[];
   private _reverseOrder: boolean = false;
@@ -80,6 +83,7 @@ export class HeaderCell extends ViewElement implements IEventListener {
 
   private headerCellMouseDown(e: MouseEvent) {
     this._mouseDown = true;
+    this._mouseDownInitalPos = new MousePosition(e.clientX, e.clientY);
   }
 
   private headerCellMouseUp(e: MouseEvent) {
@@ -101,13 +105,14 @@ export class HeaderCell extends ViewElement implements IEventListener {
     }
     this.updateCursor(e);
     if (this._mouseDown) {
+      this._mouseDownNewPos = new MousePosition(e.clientX, e.clientY);
       this.headerCellResize(e);
     }
   }
 
   private headerCellResize(e: MouseEvent) {
     const fieldname = e.srcElement.getAttribute('fieldname');
-    this.fireCallback(new HeaderCellResizeEvent(fieldname));
+    this.fireCallback(new HeaderCellResizeEvent(fieldname, this._mouseDownInitalPos, this._mouseDownNewPos));
   }
 
   private updateCursor(e: MouseEvent) {

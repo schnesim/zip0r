@@ -1,7 +1,7 @@
 import { Callback } from '../domain/callback';
-import { CallbackType } from '../domain/callbackType';
+import { IEvent } from '../ui/event';
 
 export interface IEventListener {
   registerCallback(callback: Callback);
-  fireCallback(type: CallbackType);
+  fireCallback(event: IEvent);
 }

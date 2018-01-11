@@ -10,6 +10,8 @@ import { GridConfig } from './gridConfig';
 import { GridRow } from './gridRow';
 import { HeaderCell } from './headerCell';
 import { HeaderCellClickEvent } from './headerCellClickEvent';
+import { HeaderCellResizeEvent } from './headerCellResizeEvent';
+import { GridColumnConfig } from './gridColumn';
 
 export class Grid {
 
@@ -182,10 +184,32 @@ export class Grid {
     return result;
   }
 
-  private headerCellResizeCallback() {
-    this._gridConfig.getColumnsConfig()[0].width = "200";
+  private headerCellResizeCallback(event: HeaderCellResizeEvent) {
+    const positionDelta = event.initialPos.x - event.newPos.x;
+    console.log(positionDelta)
+    const columnConfig = this.getColumnConfigByFieldname(this._gridConfig, event.fieldname);
+    if (positionDelta > 0) {
+      // New position left of original position, so decrease column width
+      columnConfig.width = (parseInt(columnConfig.width) - positionDelta).toString();
+    } else {
+      // New position right of original position, so increase column width
+      columnConfig.width = (parseInt(columnConfig.width) + positionDelta).toString();
+    }
+    // this._gridConfig.getColumnsConfig()[0].width = "200";
+    this.refreshHeaderRow();
     this.refreshGridRows();
     this.refreshHtml();
+  }
+
+  private getColumnConfigByFieldname(gridConfig: GridConfig, fieldname: string): GridColumnConfig {
+    let result = void 0;
+    for (let config of gridConfig.getColumnsConfig()) {
+      if (config.fieldname === fieldname) {
+        result = config;
+        break;
+      }
+    }
+    return result;
   }
 
   private headerCellClickCallback(event: HeaderCellClickEvent) {
@@ -197,7 +221,13 @@ export class Grid {
   private resetSortIcon() {
     this._gridHeaderRow.forEach(row => {
       row.resetSortIcon();
-    })
+    });
+  }
+
+  private refreshHeaderRow() {
+    this._tableHead.innerHTML = '';
+    this._tableHeaderRow = this.createTableHeaderRow(this._gridConfig);
+    this._tableHead.appendChild(this._tableHeaderRow);
   }
 
   private refreshGridRows() {
@@ -217,6 +247,7 @@ export class Grid {
     this._archivePath = value;
     this._archiveContent = this._zipController.openArchive(value);
     this._currentRoot = this._archiveContent;
+    this.refreshHeaderRow();
     this.refreshGridRows()
     this.refreshHtml();
   }
