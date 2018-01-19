@@ -1,0 +1,1 @@
+I should handle resize handling on container level since mouse movement outside of the headerCell can't be tracked from within the cell's code.

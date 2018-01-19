@@ -1,7 +1,7 @@
-import { GridConfig } from './gridConfig';
-import { GridRowValues } from '../../helper/wrapper';
 import { FileType } from '../../enum';
+import { GridRowValues } from '../../helper/wrapper';
 import { ViewElement } from '../viewElement';
+import { GridConfig } from './gridConfig';
 
 export class GridRow extends ViewElement {
 
@@ -38,7 +38,6 @@ export class GridRow extends ViewElement {
     // to get flex working properly.
     const wrapperDiv = document.createElement('div');
     wrapperDiv.classList.add('row-icon-and-filename');
-    wrapperDiv.style.width = this._gridConfig.getColumnsConfig()[0].width;
     wrapperDiv.appendChild(icon)
     wrapperDiv.appendChild(name)
     iconAndFilename.appendChild(wrapperDiv);

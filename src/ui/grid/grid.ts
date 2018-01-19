@@ -1,3 +1,4 @@
+import { ResizeEvent } from './resizeStartEvent';
 import { ZipController } from '../../7z/zipController';
 import { Constants } from '../../constants';
 import { Callback } from '../../domain/callback';
@@ -12,12 +13,14 @@ import { HeaderCell } from './headerCell';
 import { HeaderCellClickEvent } from './headerCellClickEvent';
 import { HeaderCellResizeEvent } from './headerCellResizeEvent';
 import { GridColumnConfig } from './gridColumn';
+import { IEventHandler } from '../../event/eventHandler';
+import { IEvent } from '../event';
 
-export class Grid {
+export class Grid extends IEventHandler {
 
   private _domNode: HTMLTableElement;
-  private _tableHead: HTMLTableSectionElement;
-  private _tableHeaderRow: HTMLTableRowElement;
+  private _htmlTableHead: HTMLTableSectionElement;
+  private _htmlTableHeaderRow: HTMLTableRowElement;
   private _gridHeaderRow: Array<HeaderCell>
   private _gridRows: Array<GridRow>;
   private _gridConfig: GridConfig;
@@ -30,19 +33,20 @@ export class Grid {
   private _shiftPressed: boolean = false;
 
   constructor(gridConfig: GridConfig) {
+    super();
     this._gridConfig = gridConfig;
     this._gridRows = [];
     this._gridHeaderRow = [];
     this._zipController = new ZipController();
-    this._tableHeaderRow = this.createTableHeaderRow(gridConfig);
+    this._htmlTableHeaderRow = this.createTableHeaderRow(gridConfig);
 
-    this._tableHead = document.createElement('thead');
-    this._tableHead.appendChild(this._tableHeaderRow);
+    this._htmlTableHead = document.createElement('thead');
+    this._htmlTableHead.appendChild(this._htmlTableHeaderRow);
 
     this._domNode = document.createElement('table');
     this._domNode.id = 'grid';
     this._domNode.classList.add('table');
-    this._domNode.appendChild(this._tableHead);
+    this._domNode.appendChild(this._htmlTableHead);
     this._domNode.tabIndex = 0; // https://stackoverflow.com/questions/887551/how-can-i-trigger-an-onkeydown-event-on-html-table-on-firefox
     this._domNode.addEventListener('keydown', this.gridKeyDownHandler.bind(this));
     this._domNode.addEventListener('keyup', this.gridKeyUpHandler.bind(this));
@@ -171,13 +175,22 @@ export class Grid {
     const result = document.createElement('tr');
     result.className = 'header';
     let columnCount = 0;
+    this._gridHeaderRow = [];
     for (var index = 0; index < gridConfig.getColumnsConfig().length; index++) {
       var columnConfig = gridConfig.getColumnsConfig()[index];
       const isFirst = index === 0;
       const isLast = index === gridConfig.getColumnsConfig().length - 1;
       const headerCell = new HeaderCell(columnConfig, columnCount);
+      this._gridHeaderRow.push(headerCell);
+      /**
+       * Maybe I should replace this with:
+       * headerCell.onClick = this.headerCellClickCallback.bind(this)
+       * headerCell.onResize...
+       */
       headerCell.registerCallback(new Callback(CallbackType.HEADER_CLICK, this.headerCellClickCallback.bind(this)));
       headerCell.registerCallback(new Callback(CallbackType.HEADER_RESIZE, this.headerCellResizeCallback.bind(this)));
+      headerCell.registerCallback(new Callback(CallbackType.HORIZONTAL_RESIZE_START, this.resizeStartCallback.bind(this)));
+      headerCell.registerCallback(new Callback(CallbackType.HORIZONTAL_RESIZE_STOP, this.resizeStopCallback.bind(this)));
       result.appendChild(headerCell.domNode);
       columnCount++;
     }
@@ -185,20 +198,32 @@ export class Grid {
   }
 
   private headerCellResizeCallback(event: HeaderCellResizeEvent) {
+    // return;
     const positionDelta = event.initialPos.x - event.newPos.x;
     console.log(positionDelta)
     const columnConfig = this.getColumnConfigByFieldname(this._gridConfig, event.fieldname);
+    if (positionDelta === 0) {
+      return;
+    }
     if (positionDelta > 0) {
       // New position left of original position, so decrease column width
-      columnConfig.width = (parseInt(columnConfig.width) - positionDelta).toString();
+      const newWidth = (parseInt(columnConfig.width) - positionDelta).toString();
+      const oldWidth = columnConfig.width;
+      console.log(oldWidth+ ' ' + newWidth)
+      columnConfig.width = newWidth;
     } else {
       // New position right of original position, so increase column width
-      columnConfig.width = (parseInt(columnConfig.width) + positionDelta).toString();
+      const newWidth = (parseInt(columnConfig.width) + positionDelta).toString();
+      const oldWidth = columnConfig.width;
+      console.log(oldWidth+ ' ' + newWidth)
+      columnConfig.width = newWidth;
     }
+    console.log(this._gridHeaderRow[0].domNode.style.width)
+    this._gridHeaderRow[0].domNode.style.width = '500px'
     // this._gridConfig.getColumnsConfig()[0].width = "200";
-    this.refreshHeaderRow();
-    this.refreshGridRows();
-    this.refreshHtml();
+    // this.refreshHeaderRow();
+    // this.refreshGridRows();
+    // this.refreshHtml();
   }
 
   private getColumnConfigByFieldname(gridConfig: GridConfig, fieldname: string): GridColumnConfig {
@@ -212,10 +237,26 @@ export class Grid {
     return result;
   }
 
+  public addCallback(callback: Callback) {
+    this.registerCallback(callback);
+  }
+
+  private callCallback(event: IEvent) {
+    this.fireCallback(event);
+  }
+
   private headerCellClickCallback(event: HeaderCellClickEvent) {
     this.resetSortIcon();
     this._gridRows = this.sortRowsByFieldNumber(event.fieldname, event.reverseOrder);
     this.refreshHtml();
+  }
+
+  private resizeStartCallback(event: ResizeEvent) {
+    this.fireCallback(event);
+  }
+
+  private resizeStopCallback(event: ResizeEvent) {
+    this.fireCallback(event);
   }
 
   private resetSortIcon() {
@@ -225,9 +266,9 @@ export class Grid {
   }
 
   private refreshHeaderRow() {
-    this._tableHead.innerHTML = '';
-    this._tableHeaderRow = this.createTableHeaderRow(this._gridConfig);
-    this._tableHead.appendChild(this._tableHeaderRow);
+    this._htmlTableHead.innerHTML = '';
+    this._htmlTableHeaderRow = this.createTableHeaderRow(this._gridConfig);
+    this._htmlTableHead.appendChild(this._htmlTableHeaderRow);
   }
 
   private refreshGridRows() {
@@ -255,7 +296,7 @@ export class Grid {
   private refreshHtml() {
     this._domNode.innerHTML = '';
     // this._gridRows = [];
-    this._domNode.appendChild(this._tableHead);
+    this._domNode.appendChild(this._htmlTableHead);
     this._gridRows.forEach(row => {
       row.domNode.addEventListener('click', this.tableRowClick.bind(this, row));
       row.domNode.addEventListener('dblclick', this.tableRowDblClick.bind(this, row));

@@ -8,6 +8,8 @@ import { Grid } from './grid/grid';
 import { GridColumnBuilder } from './grid/gridColumnFactory';
 import { GridConfig } from './grid/gridConfig';
 import { MenuButton } from './menuBar/menuButton';
+import { Callback } from '../domain/callback';
+import { CallbackType } from '../domain/callbackType';
 
 export class Container {
   private readonly _domNode: HTMLElement;
@@ -22,7 +24,7 @@ export class Container {
   private _btnAdd: MenuButton;
   private _btnExtract: MenuButton;
 
-  private first: boolean = true;
+  private _resizing: boolean = false;
 
   constructor() {
     this._domNode = document.createElement('div');
@@ -39,6 +41,7 @@ export class Container {
     // this._menuBar.registerCallback(new Callback(CallbackType.EXTRACT, this.btnExtractCallback.bind(this)));
     this._domNode.appendChild(this._menuBar.getDomNode());
     this._domNode.addEventListener('click', this.containerClick)
+    this._domNode.addEventListener('mouseup', this.containerMouseUp.bind(this));
     this._zipController = new ZipController();
     ipcRenderer.on('archive-path', this.populateGrid.bind(this));
     this.enableDisableButtons();
@@ -47,7 +50,15 @@ export class Container {
   private containerClick(e: MouseEvent) {
     const grid = document.getElementById('grid');
     if (grid !== null) {
+      // The grid needs to be focused in order for key navigation to work
       grid.focus();
+    }
+  }
+
+  private containerMouseUp(e: MouseEvent) {
+    if (this._resizing) {
+      this._resizing = false;
+      this.horizontalResizeStopCallback();
     }
   }
 
@@ -119,6 +130,9 @@ export class Container {
         .build());
     this._grid = new Grid(this._gridConfig);
     this._grid.archivePath = archivePath;
+    this._grid.addCallback(new Callback(CallbackType.HORIZONTAL_RESIZE_START, this.horizontalResizeStartCallback.bind(this)));
+    this._grid.addCallback(new Callback(CallbackType.HORIZONTAL_RESIZE_STOP, this.horizontalResizeStopCallback.bind(this)));
+
     this._archivePath = archivePath;
 
     this._gridContainer = document.createElement('div');
@@ -126,6 +140,15 @@ export class Container {
     this._gridContainer.appendChild(this._grid.getDomNode());
     this._domNode.appendChild(this._gridContainer);
     this.enableDisableButtons();
+  }
+
+  private horizontalResizeStartCallback() {
+    this._resizing = true;
+    this._domNode.style.cursor = 'ew-resize';
+  }
+
+  private horizontalResizeStopCallback() {
+    this._domNode.style.cursor = 'default';
   }
 
   public getDomNode(): HTMLElement {

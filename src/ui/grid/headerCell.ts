@@ -7,6 +7,7 @@ import { ViewElement } from '../viewElement';
 import { GridColumnConfig } from './gridColumn';
 import { HeaderCellClickEvent } from './headerCellClickEvent';
 import { HeaderCellResizeEvent } from './headerCellResizeEvent';
+import { ResizeEvent } from './resizeStartEvent';
 
 export class HeaderCell extends ViewElement implements IEventListener {
 
@@ -16,7 +17,8 @@ export class HeaderCell extends ViewElement implements IEventListener {
   private _mouseoverCallback: Function;
   private _isFirst: boolean;
   private _isLast: boolean;
-  private _mouseEnter: boolean;
+  // private _mouseEnter: boolean;
+  private _resizing: boolean;
   private _mouseDown: boolean;
   private _mouseDownInitalPos: MousePosition;
   private _mouseDownNewPos: MousePosition;
@@ -50,7 +52,7 @@ export class HeaderCell extends ViewElement implements IEventListener {
       header.addEventListener('click', this.headerCellClick.bind(this));
     }
     header.addEventListener('mouseenter', this.headerCellMouseEnter.bind(this));
-    header.addEventListener('mouseleve', this.headerCellMouseLeave.bind(this));
+    header.addEventListener('mouseleave', this.headerCellMouseLeave.bind(this));
     header.addEventListener('mousemove', this.headerCellMouseMove.bind(this));
     header.addEventListener('mousedown', this.headerCellMouseDown.bind(this));
     header.addEventListener('mouseup', this.headerCellMouseUp.bind(this));
@@ -65,76 +67,85 @@ export class HeaderCell extends ViewElement implements IEventListener {
     this._sortIcon.style.visibility = 'hidden';
   }
 
-  fireCallback(event: IEvent) {
-    if (event.callbackType === CallbackType.HEADER_CLICK) {
-      this._callbacks.forEach(callback => {
-        if (callback.type === CallbackType.HEADER_CLICK) {
-          callback.callback(event);
-        }
-      });
-    } else if (event.callbackType === CallbackType.HEADER_RESIZE) {
-      this._callbacks.forEach(callback => {
-        if (callback.type === CallbackType.HEADER_RESIZE) {
-          callback.callback(event);
-        }
-      });
-    }
+  private fireCallback(event: IEvent) {
+    this._callbacks.forEach(callback => {
+      if (callback.type === event.callbackType) {
+        callback.callback(event);
+      }
+    });
   }
 
   private headerCellMouseDown(e: MouseEvent) {
     this._mouseDown = true;
+    if (this.withinResizeArea(e)) {
+      this._resizing = true;
+    }
     this._mouseDownInitalPos = new MousePosition(e.clientX, e.clientY);
   }
 
   private headerCellMouseUp(e: MouseEvent) {
     this._mouseDown = false;
+    if (this._resizing) {
+
+    }
   }
 
   private headerCellMouseEnter(e: MouseEvent) {
-    this._mouseEnter = true;
+    // this._mouseEnter = true;
   }
 
   private headerCellMouseLeave(e: MouseEvent) {
-    this._mouseEnter = false;
-    this.domNode.style.cursor = 'default';
+    if (!this._resizing) {
+      this.fireCallback(new ResizeEvent(CallbackType.HORIZONTAL_RESIZE_STOP));
+    }
   }
 
   private headerCellMouseMove(e: MouseEvent) {
-    if (!this._mouseEnter && !this._mouseDown) {
-      return;
+    this._mouseDownNewPos = new MousePosition(e.clientX, e.clientY);
+    if (this.withinResizeArea(e)) {
+      this.fireCallback(new ResizeEvent(CallbackType.HORIZONTAL_RESIZE_START));
+    } else if (!this._resizing) {
+      this.fireCallback(new ResizeEvent(CallbackType.HORIZONTAL_RESIZE_STOP));
     }
-    this.updateCursor(e);
-    if (this._mouseDown) {
-      this._mouseDownNewPos = new MousePosition(e.clientX, e.clientY);
+    if (this._resizing) {
       this.headerCellResize(e);
     }
   }
 
   private headerCellResize(e: MouseEvent) {
     const fieldname = e.srcElement.getAttribute('fieldname');
-    this.fireCallback(new HeaderCellResizeEvent(fieldname, this._mouseDownInitalPos, this._mouseDownNewPos));
+    const colNumber = parseInt(e.srcElement.getAttribute('colNumber'));
+    this.fireCallback(new HeaderCellResizeEvent(fieldname, colNumber, this._mouseDownInitalPos, this._mouseDownNewPos));
   }
 
-  private updateCursor(e: MouseEvent) {
+  private withinResizeArea(e: MouseEvent): boolean {
     const cellBoundingRect = this.domNode.getBoundingClientRect();
     if (this.withinLeftMargin(e, cellBoundingRect) || this.withinRightMargin(e, cellBoundingRect)) {
-      this.domNode.style.cursor = 'ew-resize';
+      return true;
     }
-    else {
-      this.domNode.style.cursor = 'default';
-    }
+    return false;
   }
+
+  // private updateCursor(e: MouseEvent) {
+  //   const cellBoundingRect = this.domNode.getBoundingClientRect();
+  //   if (this.withinLeftMargin(e, cellBoundingRect) || this.withinRightMargin(e, cellBoundingRect)) {
+  //     this.domNode.style.cursor = 'ew-resize';
+  //   }
+  //   else {
+  //     this.domNode.style.cursor = 'default';
+  //   }
+  // }
 
   private withinLeftMargin(e: MouseEvent, cellBoundingRect: ClientRect) {
     const leftBoundary = cellBoundingRect.left;
     const rightBoundary = cellBoundingRect.left + 5;
-    return e.screenX >= leftBoundary && e.screenX <= rightBoundary && !this._isFirst;
+    return e.pageX >= leftBoundary && e.pageX <= rightBoundary && !this._isFirst;
   }
 
   private withinRightMargin(e: MouseEvent, cellBoundingRect: ClientRect) {
     const leftBoundary = cellBoundingRect.right - 5;
     const rightBoundary = cellBoundingRect.right;
-    return e.screenX >= leftBoundary && e.screenX <= rightBoundary && !this._isLast;
+    return e.pageX >= leftBoundary && e.pageX <= rightBoundary && !this._isLast;
   }
 
   private headerCellClick(e: MouseEvent) {
