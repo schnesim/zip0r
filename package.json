@@ -24,6 +24,7 @@
     "gulp-typescript": "^3.2.1",
     "rimraf": "^2.6.1",
     "run-sequence": "^2.1.0",
+    "tslint": "^5.9.1",
     "typescript": "^2.6.1"
   },
   "build": {
