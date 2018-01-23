@@ -10,8 +10,9 @@ import { GridConfig } from './grid/gridConfig';
 import { MenuButton } from './menuBar/menuButton';
 import { Callback } from '../domain/callback';
 import { CallbackType } from '../domain/callbackType';
+import { IEventHandler } from '../event/eventHandler';
 
-export class Container {
+export class Container extends IEventHandler {
   private readonly _domNode: HTMLElement;
   private _menuBar: MenuBar;
   private _zipController: ZipController;
@@ -27,6 +28,7 @@ export class Container {
   private _resizing: boolean = false;
 
   constructor() {
+    super();
     this._domNode = document.createElement('div');
     this._domNode.className = 'container'
     this._menuBar = new MenuBar();
@@ -42,6 +44,7 @@ export class Container {
     this._domNode.appendChild(this._menuBar.getDomNode());
     this._domNode.addEventListener('click', this.containerClick)
     this._domNode.addEventListener('mouseup', this.containerMouseUp.bind(this));
+    this._domNode.addEventListener('mousemove', this.containerMouseMove.bind(this));
     this._zipController = new ZipController();
     ipcRenderer.on('archive-path', this.populateGrid.bind(this));
     this.enableDisableButtons();
@@ -53,6 +56,10 @@ export class Container {
       // The grid needs to be focused in order for key navigation to work
       grid.focus();
     }
+  }
+
+  private containerMouseMove(e: MouseEvent) {
+    this.fireEvent()
   }
 
   private containerMouseUp(e: MouseEvent) {
@@ -129,7 +136,8 @@ export class Container {
         .setPropertyName('compressedSize')
         .build());
     this._grid = new Grid(this._gridConfig);
-    this._grid.archivePath = archivePath;
+    this._grid.archivePath = archivePath;this.registerCallback
+    this._grid.addCallback(new Callback(CallbackType.MOUSE_MOVE, ))
     this._grid.addCallback(new Callback(CallbackType.HORIZONTAL_RESIZE_START, this.horizontalResizeStartCallback.bind(this)));
     this._grid.addCallback(new Callback(CallbackType.HORIZONTAL_RESIZE_STOP, this.horizontalResizeStopCallback.bind(this)));
 

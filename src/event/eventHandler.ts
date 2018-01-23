@@ -17,7 +17,7 @@ export abstract class IEventHandler {
     this._callbacks.push(callback);
   }
   
-  public fireCallback(event: IEvent) {
+  public fireEvent(event: IEvent) {
     this._callbacks.forEach(callback => {
       if (callback.type === event.callbackType) {
         callback.callback(event);
