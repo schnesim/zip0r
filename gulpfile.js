@@ -72,7 +72,7 @@ const callback = function (electronProcState) {
 
 gulp.task('electron-download', () => {
   return electron.dest('./electron-build', {
-    version: '1.7.5',
+    version: '1.7.11',
     platform: 'win32'
   })
 })
@@ -80,7 +80,7 @@ gulp.task('electron-download', () => {
 gulp.task('electron:build:osx', function () {
     gulp.src(['dist/**/*'])
         .pipe(electron({
-            version: '1.7.5',
+            version: '1.7.11',
             platform: 'win32'
         }))
         .pipe(symdest('packages/osx'));

@@ -1,7 +1,6 @@
 import { Callback } from '../../domain/callback';
 import { CallbackType } from '../../domain/callbackType';
 import { MousePosition } from '../../domain/mousePosition';
-import { IEventListener } from '../../event/eventListener';
 import { IEvent } from '../event';
 import { ViewElement } from '../viewElement';
 import { GridColumnConfig } from './gridColumn';
@@ -9,7 +8,7 @@ import { HeaderCellClickEvent } from './headerCellClickEvent';
 import { HeaderCellResizeEvent } from './headerCellResizeEvent';
 import { ResizeEvent } from './resizeStartEvent';
 
-export class HeaderCell extends ViewElement implements IEventListener {
+export class HeaderCell extends ViewElement {
 
   private _sortIcon: HTMLImageElement;
   private _colNumber: Number;
@@ -125,16 +124,6 @@ export class HeaderCell extends ViewElement implements IEventListener {
     }
     return false;
   }
-
-  // private updateCursor(e: MouseEvent) {
-  //   const cellBoundingRect = this.domNode.getBoundingClientRect();
-  //   if (this.withinLeftMargin(e, cellBoundingRect) || this.withinRightMargin(e, cellBoundingRect)) {
-  //     this.domNode.style.cursor = 'ew-resize';
-  //   }
-  //   else {
-  //     this.domNode.style.cursor = 'default';
-  //   }
-  // }
 
   private withinLeftMargin(e: MouseEvent, cellBoundingRect: ClientRect) {
     const leftBoundary = cellBoundingRect.left;

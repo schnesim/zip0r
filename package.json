@@ -14,7 +14,7 @@
   "author": "Simon Schneider",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^1.7.9",
+    "electron": "^1.7.11",
     "electron-builder": "^19.49.0",
     "electron-connect": "^0.6.2",
     "gulp": "^3.9.1",
@@ -38,7 +38,7 @@
       "lib/darwin/**/*"
     ],
     "mac": {
-      "target": "dir"
+      "target": "default"
     }
   },
   "dependencies": {

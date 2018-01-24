@@ -242,7 +242,7 @@ export class Grid extends IEventHandler {
   }
 
   private callCallback(event: IEvent) {
-    this.fireCallback(event);
+    this.fireEvent(event);
   }
 
   private headerCellClickCallback(event: HeaderCellClickEvent) {
@@ -252,11 +252,11 @@ export class Grid extends IEventHandler {
   }
 
   private resizeStartCallback(event: ResizeEvent) {
-    this.fireCallback(event);
+    this.fireEvent(event);
   }
 
   private resizeStopCallback(event: ResizeEvent) {
-    this.fireCallback(event);
+    this.fireEvent(event);
   }
 
   private resetSortIcon() {
