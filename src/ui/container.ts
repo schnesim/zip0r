@@ -59,7 +59,7 @@ export class Container extends IEventHandler {
   }
 
   private containerMouseMove(e: MouseEvent) {
-    this.fireEvent()
+    //this.fireEvent()
   }
 
   private containerMouseUp(e: MouseEvent) {
@@ -137,7 +137,7 @@ export class Container extends IEventHandler {
         .build());
     this._grid = new Grid(this._gridConfig);
     this._grid.archivePath = archivePath;this.registerCallback
-    this._grid.addCallback(new Callback(CallbackType.MOUSE_MOVE, ))
+    // this._grid.addCallback(new Callback(CallbackType.MOUSE_MOVE, ))
     this._grid.addCallback(new Callback(CallbackType.HORIZONTAL_RESIZE_START, this.horizontalResizeStartCallback.bind(this)));
     this._grid.addCallback(new Callback(CallbackType.HORIZONTAL_RESIZE_STOP, this.horizontalResizeStopCallback.bind(this)));
 
