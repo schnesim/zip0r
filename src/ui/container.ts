@@ -10,7 +10,10 @@ import { GridConfig } from './grid/gridConfig';
 import { MenuButton } from './menuBar/menuButton';
 import { Callback } from '../domain/callback';
 import { CallbackType } from '../domain/callbackType';
+import { IEvent } from '../event/event';
 import { IEventHandler } from '../event/eventHandler';
+import { MouseMoveEvent } from '../event/mouseMoveEvent'
+import { EventType } from '../domain/eventType';
 
 export class Container extends IEventHandler {
   private readonly _domNode: HTMLElement;
@@ -24,6 +27,7 @@ export class Container extends IEventHandler {
   private _lastDestDir: string = '';
   private _btnAdd: MenuButton;
   private _btnExtract: MenuButton;
+  private _listeners: object[];
 
   private _resizing: boolean = false;
 
@@ -60,6 +64,13 @@ export class Container extends IEventHandler {
 
   private containerMouseMove(e: MouseEvent) {
     //this.fireEvent()
+    this.notify(new MouseMoveEvent(e));
+  }
+
+  private notify(event: IEvent) {
+    this._listeners.forEach(element => {
+      if (element.p)
+    });
   }
 
   private containerMouseUp(e: MouseEvent) {
@@ -107,6 +118,10 @@ export class Container extends IEventHandler {
     }, this.selectDestinationCallback.bind(this));
   }
 
+  private registerListeners(events: EventType[]) {
+    this._listeners
+  }
+
   public populateGrid(event, archivePath) {
     if (this._gridContainer) {
       this._domNode.removeChild(this._gridContainer);
@@ -136,10 +151,11 @@ export class Container extends IEventHandler {
         .setPropertyName('compressedSize')
         .build());
     this._grid = new Grid(this._gridConfig);
-    this._grid.archivePath = archivePath;this.registerCallback
+    this._grid.archivePath = archivePath; this.registerCallback
     // this._grid.addCallback(new Callback(CallbackType.MOUSE_MOVE, ))
     this._grid.addCallback(new Callback(CallbackType.HORIZONTAL_RESIZE_START, this.horizontalResizeStartCallback.bind(this)));
     this._grid.addCallback(new Callback(CallbackType.HORIZONTAL_RESIZE_STOP, this.horizontalResizeStopCallback.bind(this)));
+    this.registerListeners(this._grid.eventTypes, this._grid);
 
     this._archivePath = archivePath;
 

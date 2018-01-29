@@ -15,13 +15,19 @@ import { HeaderCellResizeEvent } from './headerCellResizeEvent';
 import { GridColumnConfig } from './gridColumn';
 import { IEventHandler } from '../../event/eventHandler';
 import { IEvent } from '../event';
+import { EventType } from '../../domain/eventType';
+import { IEventListener } from '../../event/listener';
 
-export class Grid extends IEventHandler {
+export class Grid extends IEventHandler implements IEventListener {
+  notify(event: EventType) {
+    throw new Error("Method not implemented.");
+  }
 
   private _domNode: HTMLTableElement;
   private _htmlTableHead: HTMLTableSectionElement;
   private _htmlTableHeaderRow: HTMLTableRowElement;
   private _gridHeaderRow: Array<HeaderCell>
+  private _eventTypes: EventType[];
   private _gridRows: Array<GridRow>;
   private _gridConfig: GridConfig;
   private _columnCount: number;
@@ -50,6 +56,9 @@ export class Grid extends IEventHandler {
     this._domNode.tabIndex = 0; // https://stackoverflow.com/questions/887551/how-can-i-trigger-an-onkeydown-event-on-html-table-on-firefox
     this._domNode.addEventListener('keydown', this.gridKeyDownHandler.bind(this));
     this._domNode.addEventListener('keyup', this.gridKeyUpHandler.bind(this));
+
+    this._eventTypes = [];
+    this._eventTypes.push(EventType.MOUSE_MOVE);
   }
 
   private gridKeyDownHandler(e: KeyboardEvent) {
@@ -380,6 +389,11 @@ export class Grid extends IEventHandler {
     }
     this.refreshHtml();
   }
+
+  public get eventTypes() : EventType[] {
+    return this._eventTypes;
+  }
+  
 
   public getDomNode(): HTMLTableElement {
     return this._domNode;
