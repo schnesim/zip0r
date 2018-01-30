@@ -1,7 +1,9 @@
-import { IEvent } from "./event";
+import { IPublishEvent } from "./event";
 import { CallbackType } from "../domain/callbackType";
+import { EventType } from "../domain/eventType";
 
-export class MouseMoveEvent implements IEvent {
+export class MouseMoveEvent implements IPublishEvent {
+  eventType: EventType;
   callbackType: CallbackType;
   private _mouseEvent: MouseEvent;
 

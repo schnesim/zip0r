@@ -6,10 +6,20 @@ import { ViewElement } from '../viewElement';
 import { GridColumnConfig } from './gridColumn';
 import { HeaderCellClickEvent } from './headerCellClickEvent';
 import { HeaderCellResizeEvent } from './headerCellResizeEvent';
-import { ResizeEvent } from './resizeStartEvent';
+import { ResizeStartEvent } from './resizeStartEvent';
+import { IEventListener } from '../../event/listener';
+import { EventType } from '../../domain/eventType';
+import { IPublishEvent } from '../../event/event';
 
-export class HeaderCell extends ViewElement {
-
+export class HeaderCell extends ViewElement implements IEventListener {
+  notify(event: IPublishEvent) {
+    switch (event.eventType) {
+      case EventType.RESIZE: {
+        this.publish(event);
+      }
+    }
+  }
+  
   private _sortIcon: HTMLImageElement;
   private _colNumber: Number;
   private _clickCallback: Function;
@@ -24,13 +34,17 @@ export class HeaderCell extends ViewElement {
   private _gridColum: GridColumnConfig;
   private _callbacks: Callback[];
   private _reverseOrder: boolean = false;
+  
+  eventTypes: EventType[];
 
   constructor(column: GridColumnConfig, colNumber: number) {
     super();
     this._isFirst = column.isFirst;
     this._isLast = column.isLast;
     this._callbacks = [];
-    this.createHeaderCell(column, colNumber)
+    this.eventTypes = [];
+    this.eventTypes.push(EventType.RESIZE);
+    this.createHeaderCell(column, colNumber);
   }
 
   private createHeaderCell(column: GridColumnConfig, colNumber: number) {
@@ -95,16 +109,16 @@ export class HeaderCell extends ViewElement {
 
   private headerCellMouseLeave(e: MouseEvent) {
     if (!this._resizing) {
-      this.fireCallback(new ResizeEvent(CallbackType.HORIZONTAL_RESIZE_STOP));
+      this.fireCallback(new ResizeStartEvent(CallbackType.HORIZONTAL_RESIZE_STOP));
     }
   }
 
   private headerCellMouseMove(e: MouseEvent) {
     this._mouseDownNewPos = new MousePosition(e.clientX, e.clientY);
     if (this.withinResizeArea(e)) {
-      this.fireCallback(new ResizeEvent(CallbackType.HORIZONTAL_RESIZE_START));
+      this.fireCallback(new ResizeStartEvent(CallbackType.HORIZONTAL_RESIZE_START));
     } else if (!this._resizing) {
-      this.fireCallback(new ResizeEvent(CallbackType.HORIZONTAL_RESIZE_STOP));
+      this.fireCallback(new ResizeStartEvent(CallbackType.HORIZONTAL_RESIZE_STOP));
     }
     if (this._resizing) {
       this.headerCellResize(e);

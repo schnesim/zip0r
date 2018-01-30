@@ -1,4 +1,4 @@
-import { ResizeEvent } from './resizeStartEvent';
+import { ResizeStartEvent } from './resizeStartEvent';
 import { ZipController } from '../../7z/zipController';
 import { Constants } from '../../constants';
 import { Callback } from '../../domain/callback';
@@ -14,15 +14,35 @@ import { HeaderCellClickEvent } from './headerCellClickEvent';
 import { HeaderCellResizeEvent } from './headerCellResizeEvent';
 import { GridColumnConfig } from './gridColumn';
 import { IEventHandler } from '../../event/eventHandler';
-import { IEvent } from '../event';
 import { EventType } from '../../domain/eventType';
 import { IEventListener } from '../../event/listener';
+import { IPublishEvent } from '../../event/event';
+import { IEventPublisher } from '../../event/publisher';
 
-export class Grid extends IEventHandler implements IEventListener {
-  notify(event: EventType) {
-    throw new Error("Method not implemented.");
+export class Grid extends IEventHandler implements IEventListener, IEventPublisher {
+  registerListener(listener: IEventListener) {
+    this._listeners.push(listener);
   }
-
+  publish(event: IPublishEvent) {
+    this.listeners.forEach(element => {
+      const match = element.eventTypes.find(x => x === event.eventType);
+       if (match !== void 0) {
+         element.notify(event);
+       }
+    });
+  }
+  notify(event: IPublishEvent) {
+    switch (event.eventType) {
+      case EventType.RESIZE: {
+        this.resizeColumn(event);
+      }
+    }
+  }
+  public get listeners() : IEventListener[] {
+    return this._listeners;
+  }
+  
+  
   private _domNode: HTMLTableElement;
   private _htmlTableHead: HTMLTableSectionElement;
   private _htmlTableHeaderRow: HTMLTableRowElement;
@@ -37,6 +57,8 @@ export class Grid extends IEventHandler implements IEventListener {
   private _zipController: ZipController;
   private _ctrlPressed: boolean = false;
   private _shiftPressed: boolean = false;
+  private _listeners: IEventListener[] = [];
+  
 
   constructor(gridConfig: GridConfig) {
     super();
@@ -58,7 +80,7 @@ export class Grid extends IEventHandler implements IEventListener {
     this._domNode.addEventListener('keyup', this.gridKeyUpHandler.bind(this));
 
     this._eventTypes = [];
-    this._eventTypes.push(EventType.MOUSE_MOVE);
+    this._eventTypes.push(EventType.RESIZE);
   }
 
   private gridKeyDownHandler(e: KeyboardEvent) {
@@ -190,6 +212,7 @@ export class Grid extends IEventHandler implements IEventListener {
       const isFirst = index === 0;
       const isLast = index === gridConfig.getColumnsConfig().length - 1;
       const headerCell = new HeaderCell(columnConfig, columnCount);
+      this.registerListener(headerCell);
       this._gridHeaderRow.push(headerCell);
       /**
        * Maybe I should replace this with:
@@ -204,6 +227,10 @@ export class Grid extends IEventHandler implements IEventListener {
       columnCount++;
     }
     return result;
+  }
+
+  private resizeColumn(event: ResizeStartEvent) {
+    
   }
 
   private headerCellResizeCallback(event: HeaderCellResizeEvent) {
@@ -250,21 +277,17 @@ export class Grid extends IEventHandler implements IEventListener {
     this.registerCallback(callback);
   }
 
-  private callCallback(event: IEvent) {
-    this.fireEvent(event);
-  }
-
   private headerCellClickCallback(event: HeaderCellClickEvent) {
     this.resetSortIcon();
     this._gridRows = this.sortRowsByFieldNumber(event.fieldname, event.reverseOrder);
     this.refreshHtml();
   }
 
-  private resizeStartCallback(event: ResizeEvent) {
+  private resizeStartCallback(event: ResizeStartEvent) {
     this.fireEvent(event);
   }
 
-  private resizeStopCallback(event: ResizeEvent) {
+  private resizeStopCallback(event: ResizeStartEvent) {
     this.fireEvent(event);
   }
 

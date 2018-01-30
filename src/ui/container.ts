@@ -10,12 +10,16 @@ import { GridConfig } from './grid/gridConfig';
 import { MenuButton } from './menuBar/menuButton';
 import { Callback } from '../domain/callback';
 import { CallbackType } from '../domain/callbackType';
-import { IEvent } from '../event/event';
+import { IPublishEvent } from '../event/event';
 import { IEventHandler } from '../event/eventHandler';
 import { MouseMoveEvent } from '../event/mouseMoveEvent'
-import { EventType } from '../domain/eventType';
+import { IEventPublisher } from '../event/publisher'
+import { IEventListener } from '../event/listener';
+import { ResizeEvent } from '../event/resizeEvent';
+import { ResizeStartEvent } from './grid/resizeStartEvent';
 
-export class Container extends IEventHandler {
+export class Container extends IEventHandler implements IEventPublisher {
+  
   private readonly _domNode: HTMLElement;
   private _menuBar: MenuBar;
   private _zipController: ZipController;
@@ -27,8 +31,8 @@ export class Container extends IEventHandler {
   private _lastDestDir: string = '';
   private _btnAdd: MenuButton;
   private _btnExtract: MenuButton;
-  private _listeners: object[];
-
+  private _listeners: IEventListener[] = [];
+  
   private _resizing: boolean = false;
 
   constructor() {
@@ -54,6 +58,11 @@ export class Container extends IEventHandler {
     this.enableDisableButtons();
   }
 
+  public get listeners() : IEventListener[] {
+    return this._listeners;
+  }
+  
+
   private containerClick(e: MouseEvent) {
     const grid = document.getElementById('grid');
     if (grid !== null) {
@@ -63,13 +72,17 @@ export class Container extends IEventHandler {
   }
 
   private containerMouseMove(e: MouseEvent) {
-    //this.fireEvent()
-    this.notify(new MouseMoveEvent(e));
+    if (this._resizing) {
+      this.publish(new ResizeEvent());
+    }
   }
 
-  private notify(event: IEvent) {
-    this._listeners.forEach(element => {
-      if (element.p)
+  publish(event: IPublishEvent) {
+    this.listeners.forEach(element => {
+      const match = element.eventTypes.find(x => x === event.eventType);
+       if (match !== void 0) {
+         element.notify(event);
+       }
     });
   }
 
@@ -118,8 +131,8 @@ export class Container extends IEventHandler {
     }, this.selectDestinationCallback.bind(this));
   }
 
-  private registerListeners(events: EventType[]) {
-    this._listeners
+  registerListener(listener: IEventListener) {
+    this._listeners.push(listener);
   }
 
   public populateGrid(event, archivePath) {
@@ -155,7 +168,7 @@ export class Container extends IEventHandler {
     // this._grid.addCallback(new Callback(CallbackType.MOUSE_MOVE, ))
     this._grid.addCallback(new Callback(CallbackType.HORIZONTAL_RESIZE_START, this.horizontalResizeStartCallback.bind(this)));
     this._grid.addCallback(new Callback(CallbackType.HORIZONTAL_RESIZE_STOP, this.horizontalResizeStopCallback.bind(this)));
-    this.registerListeners(this._grid.eventTypes, this._grid);
+    this.registerListener(this._grid);
 
     this._archivePath = archivePath;
 
@@ -166,7 +179,9 @@ export class Container extends IEventHandler {
     this.enableDisableButtons();
   }
 
-  private horizontalResizeStartCallback() {
+  private horizontalResizeStartCallback(event: ResizeStartEvent) {
+    debugger;
+    console.log(event);
     this._resizing = true;
     this._domNode.style.cursor = 'ew-resize';
   }
