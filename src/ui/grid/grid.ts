@@ -18,6 +18,9 @@ import { EventType } from '../../domain/eventType';
 import { IEventListener } from '../../event/listener';
 import { IPublishEvent } from '../../event/event';
 import { IEventPublisher } from '../../event/publisher';
+import { ResizeEvent } from '../../event/resizeEvent';
+import { MousePosition } from '../../domain/mousePosition';
+import { MouseMoveEvent } from '../../event/mouseMoveEvent';
 
 export class Grid extends IEventHandler implements IEventListener, IEventPublisher {
   registerListener(listener: IEventListener) {
@@ -33,8 +36,13 @@ export class Grid extends IEventHandler implements IEventListener, IEventPublish
   }
   notify(event: IPublishEvent) {
     switch (event.eventType) {
-      case EventType.RESIZE: {
-        this.resizeColumn(event);
+      case EventType.MOUSE_MOVE: {
+        if (this._resizing) {
+          const e = <MouseMoveEvent> event;
+          const resizeEvent = new ResizeEvent(this._resizeStartEvent.fieldname, 0, this._resizeStartEvent.initialPos,
+            new MousePosition(e.mouseEvent.clientX, e.mouseEvent.clientY));
+          this.resizeColumn(resizeEvent);
+        }
       }
     }
   }
@@ -57,6 +65,8 @@ export class Grid extends IEventHandler implements IEventListener, IEventPublish
   private _zipController: ZipController;
   private _ctrlPressed: boolean = false;
   private _shiftPressed: boolean = false;
+  private _resizing: boolean = false;
+  private _resizeStartEvent: ResizeStartEvent;
   private _listeners: IEventListener[] = [];
   
 
@@ -80,7 +90,7 @@ export class Grid extends IEventHandler implements IEventListener, IEventPublish
     this._domNode.addEventListener('keyup', this.gridKeyUpHandler.bind(this));
 
     this._eventTypes = [];
-    this._eventTypes.push(EventType.RESIZE);
+    this._eventTypes.push(EventType.MOUSE_MOVE);
   }
 
   private gridKeyDownHandler(e: KeyboardEvent) {
@@ -229,12 +239,32 @@ export class Grid extends IEventHandler implements IEventListener, IEventPublish
     return result;
   }
 
-  private resizeColumn(event: ResizeStartEvent) {
-    
+  private resizeColumn(event: ResizeEvent) {
+    const positionDelta = event.initialPos.x - event.newPos.x;
+    console.log(positionDelta)
+    const columnConfig = this.getColumnConfigByFieldname(this._gridConfig, event.fieldname);
+    if (positionDelta === 0) {
+      return;
+    }
+    if (positionDelta > 0) {
+      // New position left of original position, so decrease column width
+      const newWidth = (parseInt(columnConfig.width) - positionDelta).toString();
+      const oldWidth = columnConfig.width;
+      console.log(oldWidth+ ' ' + newWidth)
+      columnConfig.width = newWidth;
+    } else {
+      // New position right of original position, so increase column width
+      const newWidth = (parseInt(columnConfig.width) + positionDelta).toString();
+      const oldWidth = columnConfig.width;
+      console.log(oldWidth+ ' ' + newWidth)
+      columnConfig.width = newWidth;
+    }
+    console.log(this._gridHeaderRow[0].domNode.style.width)
+    this._gridHeaderRow[0].domNode.style.width = columnConfig.width + 'px'
   }
 
   private headerCellResizeCallback(event: HeaderCellResizeEvent) {
-    // return;
+    return;
     const positionDelta = event.initialPos.x - event.newPos.x;
     console.log(positionDelta)
     const columnConfig = this.getColumnConfigByFieldname(this._gridConfig, event.fieldname);
@@ -256,6 +286,7 @@ export class Grid extends IEventHandler implements IEventListener, IEventPublish
     }
     console.log(this._gridHeaderRow[0].domNode.style.width)
     this._gridHeaderRow[0].domNode.style.width = '500px'
+
     // this._gridConfig.getColumnsConfig()[0].width = "200";
     // this.refreshHeaderRow();
     // this.refreshGridRows();
@@ -284,10 +315,13 @@ export class Grid extends IEventHandler implements IEventListener, IEventPublish
   }
 
   private resizeStartCallback(event: ResizeStartEvent) {
+    this._resizing = true;
+    this._resizeStartEvent = event;
     this.fireEvent(event);
   }
 
   private resizeStopCallback(event: ResizeStartEvent) {
+    this._resizing = false;
     this.fireEvent(event);
   }
 

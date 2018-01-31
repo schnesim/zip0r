@@ -33,5 +33,10 @@ export class ResizeEvent implements IPublishEvent {
   public get newPos(): MousePosition {
     return this._newPos;
   }
+
+  public set newPos(v : MousePosition) {
+    this._newPos = v;
+  }
+  
 }
 

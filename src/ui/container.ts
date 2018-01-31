@@ -72,8 +72,9 @@ export class Container extends IEventHandler implements IEventPublisher {
   }
 
   private containerMouseMove(e: MouseEvent) {
-    if (this._resizing) {
-      this.publish(new ResizeEvent());
+    if (this._resizing) { 
+      this.publish(new MouseMoveEvent(e));
+      // this.publish(new ResizeEvent());
     }
   }
 
@@ -180,7 +181,6 @@ export class Container extends IEventHandler implements IEventPublisher {
   }
 
   private horizontalResizeStartCallback(event: ResizeStartEvent) {
-    debugger;
     console.log(event);
     this._resizing = true;
     this._domNode.style.cursor = 'ew-resize';

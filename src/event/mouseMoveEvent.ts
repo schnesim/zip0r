@@ -3,7 +3,7 @@ import { CallbackType } from "../domain/callbackType";
 import { EventType } from "../domain/eventType";
 
 export class MouseMoveEvent implements IPublishEvent {
-  eventType: EventType;
+  eventType: EventType = EventType.MOUSE_MOVE;
   callbackType: CallbackType;
   private _mouseEvent: MouseEvent;
 

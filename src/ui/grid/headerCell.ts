@@ -14,7 +14,7 @@ import { IPublishEvent } from '../../event/event';
 export class HeaderCell extends ViewElement implements IEventListener {
   notify(event: IPublishEvent) {
     switch (event.eventType) {
-      case EventType.RESIZE: {
+      case EventType.MOUSE_MOVE: {
         this.publish(event);
       }
     }
@@ -43,7 +43,7 @@ export class HeaderCell extends ViewElement implements IEventListener {
     this._isLast = column.isLast;
     this._callbacks = [];
     this.eventTypes = [];
-    this.eventTypes.push(EventType.RESIZE);
+    this.eventTypes.push(EventType.MOUSE_MOVE);
     this.createHeaderCell(column, colNumber);
   }
 
@@ -115,14 +115,18 @@ export class HeaderCell extends ViewElement implements IEventListener {
 
   private headerCellMouseMove(e: MouseEvent) {
     this._mouseDownNewPos = new MousePosition(e.clientX, e.clientY);
-    if (this.withinResizeArea(e)) {
+    if (this.withinResizeArea(e) && this._mouseDown) {
       this.fireCallback(new ResizeStartEvent(CallbackType.HORIZONTAL_RESIZE_START));
+    } else if (this.withinResizeArea(e) && !this._mouseDown) {
+      this.domNode.style.cursor = 'ew-resize';
+    } else if (!this.withinResizeArea(e)) {
+      this.domNode.style.cursor = 'default';
     } else if (!this._resizing) {
       this.fireCallback(new ResizeStartEvent(CallbackType.HORIZONTAL_RESIZE_STOP));
     }
-    if (this._resizing) {
-      this.headerCellResize(e);
-    }
+    // if (this._resizing) {
+    //   this.headerCellResize(e);
+    // }
   }
 
   private headerCellResize(e: MouseEvent) {

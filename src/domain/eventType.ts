@@ -1,3 +1,3 @@
 export enum EventType {
-  RESIZE
+  MOUSE_MOVE
 }
