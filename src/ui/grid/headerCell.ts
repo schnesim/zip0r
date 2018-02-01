@@ -19,13 +19,14 @@ export class HeaderCell extends ViewElement implements IEventListener {
       }
     }
   }
-  
+
   private _sortIcon: HTMLImageElement;
   private _colNumber: Number;
   private _clickCallback: Function;
   private _mouseoverCallback: Function;
   private _isFirst: boolean;
   private _isLast: boolean;
+  private _sortable: boolean;
   // private _mouseEnter: boolean;
   private _resizing: boolean;
   private _mouseDown: boolean;
@@ -34,7 +35,7 @@ export class HeaderCell extends ViewElement implements IEventListener {
   private _gridColum: GridColumnConfig;
   private _callbacks: Callback[];
   private _reverseOrder: boolean = false;
-  
+
   eventTypes: EventType[];
 
   constructor(column: GridColumnConfig, colNumber: number) {
@@ -52,6 +53,7 @@ export class HeaderCell extends ViewElement implements IEventListener {
     header.className = 'header-cell';
     header.textContent = column.title;
     header.style.width = column.width;
+    this._sortable = column.sortable;
     if (column.sortable) {
       this._sortIcon = document.createElement('img');
       this._sortIcon.src = './ui/grid/arrow-down.svg';
@@ -77,7 +79,9 @@ export class HeaderCell extends ViewElement implements IEventListener {
   }
 
   public resetSortIcon() {
-    this._sortIcon.style.visibility = 'hidden';
+    if (this._sortIcon) {
+      this._sortIcon.style.visibility = 'hidden';
+    }
   }
 
   private fireCallback(event: IEvent) {
@@ -91,7 +95,12 @@ export class HeaderCell extends ViewElement implements IEventListener {
   private headerCellMouseDown(e: MouseEvent) {
     this._mouseDown = true;
     if (this.withinResizeArea(e)) {
-      this._resizing = true;
+      this.fireCallback(
+        new ResizeStartEvent(
+          CallbackType.HORIZONTAL_RESIZE_START,
+          e.srcElement.getAttribute('fieldname'),
+          this._mouseDownInitalPos)
+      );
     }
     this._mouseDownInitalPos = new MousePosition(e.clientX, e.clientY);
   }
@@ -109,30 +118,28 @@ export class HeaderCell extends ViewElement implements IEventListener {
 
   private headerCellMouseLeave(e: MouseEvent) {
     if (!this._resizing) {
-      this.fireCallback(new ResizeStartEvent(CallbackType.HORIZONTAL_RESIZE_STOP));
+      // const fieldname = e.srcElement.getAttribute('fieldname');
+      // this.fireCallback(new ResizeStartEvent(CallbackType.HORIZONTAL_RESIZE_STOP, fieldname, this._mouseDownInitalPos));
     }
   }
 
   private headerCellMouseMove(e: MouseEvent) {
-    this._mouseDownNewPos = new MousePosition(e.clientX, e.clientY);
-    if (this.withinResizeArea(e) && this._mouseDown) {
-      this.fireCallback(new ResizeStartEvent(CallbackType.HORIZONTAL_RESIZE_START));
-    } else if (this.withinResizeArea(e) && !this._mouseDown) {
-      this.domNode.style.cursor = 'ew-resize';
-    } else if (!this.withinResizeArea(e)) {
-      this.domNode.style.cursor = 'default';
-    } else if (!this._resizing) {
-      this.fireCallback(new ResizeStartEvent(CallbackType.HORIZONTAL_RESIZE_STOP));
-    }
+    // this._mouseDownNewPos = new MousePosition(e.clientX, e.clientY);
+    // if (this.withinResizeArea(e) && this._mouseDown) {
+    // } else if (this.withinResizeArea(e) && !this._mouseDown) {
+    //   this.domNode.style.cursor = 'ew-resize';
+    // } else if (!this.withinResizeArea(e) && !this._resizing) {
+    //   // Problem: If I'm resizing column one and move the cursor accross the middle of column 2 then the cursor style will
+    //   // turn to default style, since the 2nd column doesn't know that resizing is going on.
+    //   // So the container class has to be solely responsible for any cursor change.
+    //   this.domNode.style.cursor = 'default';
+    // }
+    // else if (!this._resizing) {
+    //   this.fireCallback(new ResizeStartEvent(CallbackType.HORIZONTAL_RESIZE_STOP, fieldname, this._mouseDownInitalPos));
+    // }
     // if (this._resizing) {
     //   this.headerCellResize(e);
     // }
-  }
-
-  private headerCellResize(e: MouseEvent) {
-    const fieldname = e.srcElement.getAttribute('fieldname');
-    const colNumber = parseInt(e.srcElement.getAttribute('colNumber'));
-    this.fireCallback(new HeaderCellResizeEvent(fieldname, colNumber, this._mouseDownInitalPos, this._mouseDownNewPos));
   }
 
   private withinResizeArea(e: MouseEvent): boolean {

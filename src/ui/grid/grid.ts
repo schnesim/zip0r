@@ -240,33 +240,38 @@ export class Grid extends IEventHandler implements IEventListener, IEventPublish
   }
 
   private resizeColumn(event: ResizeEvent) {
+    return;
+    // console.log('resizing column')
     const positionDelta = event.initialPos.x - event.newPos.x;
     console.log(positionDelta)
+    let oldWidth, newWidth;
     const columnConfig = this.getColumnConfigByFieldname(this._gridConfig, event.fieldname);
     if (positionDelta === 0) {
       return;
     }
     if (positionDelta > 0) {
       // New position left of original position, so decrease column width
-      const newWidth = (parseInt(columnConfig.width) - positionDelta).toString();
-      const oldWidth = columnConfig.width;
-      console.log(oldWidth+ ' ' + newWidth)
+      newWidth = (parseInt(columnConfig.width) - positionDelta).toString();
+      oldWidth = columnConfig.width;
+      // console.log(oldWidth+ ' ' + newWidth)
       columnConfig.width = newWidth;
     } else {
       // New position right of original position, so increase column width
-      const newWidth = (parseInt(columnConfig.width) + positionDelta).toString();
-      const oldWidth = columnConfig.width;
-      console.log(oldWidth+ ' ' + newWidth)
+      newWidth = (parseInt(columnConfig.width) + positionDelta).toString();
+      oldWidth = columnConfig.width;
+      // console.log(oldWidth+ ' ' + newWidth)
       columnConfig.width = newWidth;
     }
-    console.log(this._gridHeaderRow[0].domNode.style.width)
+    // console.log(this._gridHeaderRow[0].domNode.style.width)
+    console.log(oldWidth)
+    console.log(newWidth)
     this._gridHeaderRow[0].domNode.style.width = columnConfig.width + 'px'
   }
 
   private headerCellResizeCallback(event: HeaderCellResizeEvent) {
     return;
     const positionDelta = event.initialPos.x - event.newPos.x;
-    console.log(positionDelta)
+    // console.log(positionDelta)
     const columnConfig = this.getColumnConfigByFieldname(this._gridConfig, event.fieldname);
     if (positionDelta === 0) {
       return;
@@ -275,16 +280,16 @@ export class Grid extends IEventHandler implements IEventListener, IEventPublish
       // New position left of original position, so decrease column width
       const newWidth = (parseInt(columnConfig.width) - positionDelta).toString();
       const oldWidth = columnConfig.width;
-      console.log(oldWidth+ ' ' + newWidth)
+      // console.log(oldWidth+ ' ' + newWidth)
       columnConfig.width = newWidth;
     } else {
       // New position right of original position, so increase column width
       const newWidth = (parseInt(columnConfig.width) + positionDelta).toString();
       const oldWidth = columnConfig.width;
-      console.log(oldWidth+ ' ' + newWidth)
+      // console.log(oldWidth+ ' ' + newWidth)
       columnConfig.width = newWidth;
     }
-    console.log(this._gridHeaderRow[0].domNode.style.width)
+    // console.log(this._gridHeaderRow[0].domNode.style.width)
     this._gridHeaderRow[0].domNode.style.width = '500px'
 
     // this._gridConfig.getColumnsConfig()[0].width = "200";
