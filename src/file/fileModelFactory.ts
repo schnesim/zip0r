@@ -40,14 +40,15 @@ export class FileModelFactory {
   }
 
   private attr2FileType(attr: string) {
-    if (attr === this.ATTR_DIRECTORY) {
+    if (attr === this.ATTR_DIRECTORY || attr === '') {
       return FileType.DIRECTORY;
     }
     return FileType.FILE;
   }
 
   /**
-   * Checks if "currentNode" already contains a childnode of the name "currentPart".
+   * Checks if "currentNode" already contains a childnode of the name "currentPart"
+   * and returns it.
    */
   private containsPart(currentNode: FileModel, currentPart: string): FileModel {
     for (let child of currentNode.children) {
@@ -62,15 +63,15 @@ export class FileModelFactory {
     lineArray: Array<string>) {
     const currentPart = pathParts[0];
     const remainingParts = pathParts.slice(1, pathParts.length);
-    const child = this.containsPart(currentNode, currentPart);
-    if (child) {
-      this.createDeepFileModel(child, remainingParts, lineArray);
+    const containsPart = this.containsPart(currentNode, currentPart);
+    if (containsPart) {
+      this.createDeepFileModel(containsPart, remainingParts, lineArray);
     } else {
-      const builder = new FileModelBuilder();
       if (this.upReferenceMissing(currentNode)) {
         currentNode.children.push(this.createUpReference(currentNode));
       }
       const child = this.buildModel(lineArray, currentNode);
+      console.log(child)
       child.filename = currentPart;
       // In case a folder has no children, we still need an up refernce.
       child.children.push(this.createUpReference(child));
@@ -107,7 +108,7 @@ export class FileModelFactory {
     let s = line;//'2017-09-13 09:58:58 ....A          650          459  package.json'
     const lines = [];
     lines.push(s.substr(0, 10));                    // date
-    lines.push(s.substr(12, 19));                   // time
+    lines.push(s.substr(11, 8));                   // time
     lines.push(s.substr(20, 5).replace(/\./g, '')); // attribute
     lines.push(s.substr(26, 12).trim());            // size
     lines.push(s.substr(39, 12).trim());            // compressed size
