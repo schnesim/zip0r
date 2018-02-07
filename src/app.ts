@@ -3,13 +3,16 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { Container } from './ui/container';
 import { remote } from 'electron'
+import { Overlay } from './ui/messageOverlay';
 const { Menu, MenuItem } = remote
 let container;
 
 document.addEventListener('DOMContentLoaded', function () {
   container = new Container();
-
+  
   const body = document.getElementsByTagName('body')[0];
+  const message = new Overlay();
+  body.appendChild(message.domNode);
   body.appendChild(container.getDomNode());
   // prevent content selection by double clicking
   body.addEventListener('mousedown', (e) => { e.preventDefault() });
@@ -26,4 +29,5 @@ document.addEventListener('DOMContentLoaded', function () {
   if (process.env.NODE_ENV === 'development') {
     container.populateGrid(void 0, "zip0r.7z");
   }
+
 });

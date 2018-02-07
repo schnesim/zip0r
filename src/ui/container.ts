@@ -17,9 +17,10 @@ import { IEventPublisher } from '../event/publisher'
 import { IEventListener } from '../event/listener';
 import { ResizeEvent } from '../event/resizeEvent';
 import { ResizeStartEvent } from './grid/resizeStartEvent';
+import { Overlay } from './messageOverlay'
 
 export class Container extends IEventHandler implements IEventPublisher {
-  
+
   private readonly _domNode: HTMLElement;
   private _menuBar: MenuBar;
   private _zipController: ZipController;
@@ -32,7 +33,7 @@ export class Container extends IEventHandler implements IEventPublisher {
   private _btnAdd: MenuButton;
   private _btnExtract: MenuButton;
   private _listeners: IEventListener[] = [];
-  
+
   private _resizing: boolean = false;
 
   constructor() {
@@ -56,12 +57,14 @@ export class Container extends IEventHandler implements IEventPublisher {
     this._zipController = new ZipController();
     ipcRenderer.on('archive-path', this.populateGrid.bind(this));
     this.enableDisableButtons();
+
+
   }
 
-  public get listeners() : IEventListener[] {
+  public get listeners(): IEventListener[] {
     return this._listeners;
   }
-  
+
 
   private containerClick(e: MouseEvent) {
     const grid = document.getElementById('grid');
@@ -72,7 +75,7 @@ export class Container extends IEventHandler implements IEventPublisher {
   }
 
   private containerMouseMove(e: MouseEvent) {
-    if (this._resizing) { 
+    if (this._resizing) {
       this.publish(new MouseMoveEvent(e));
       // this.publish(new ResizeEvent());
     }
@@ -81,9 +84,9 @@ export class Container extends IEventHandler implements IEventPublisher {
   publish(event: IPublishEvent) {
     this.listeners.forEach(element => {
       const match = element.eventTypes.find(x => x === event.eventType);
-       if (match !== void 0) {
-         element.notify(event);
-       }
+      if (match !== void 0) {
+        element.notify(event);
+      }
     });
   }
 

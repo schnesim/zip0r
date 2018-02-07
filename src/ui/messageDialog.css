@@ -1,0 +1,12 @@
+.dialogFrame {
+  background-color: white;
+  width: 400px;
+  height: 200px;
+  display: flex;
+  flex-direction: row;
+}
+
+.inputField {
+  position: relative;
+  z-index: 1;
+}
